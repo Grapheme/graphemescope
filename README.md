@@ -10,20 +10,28 @@ Grapheme 2.0
 1. Установить [node.js](http://nodejs.org/)
 2. Установить `grunt` и `coffee-script`:
 
-	npm install -g grunt
-	npm install -g coffee-script
+```
+npm install -g grunt
+npm install -g coffee-script
+```
 3. Установить зависимости проекта:
-	
-	cd grapheme2.0
-	npm install
+
+```	
+cd grapheme2.0
+npm install
+```
 
 #### Сборка файлов 
-1. Сборка файлов проекта осуществляется командой:
-	
-	grunt
+Сборка файлов проекта осуществляется командой:
+
+```	
+grunt
+```
 
 #### Live Reload
 Средство grunt также позволяет отслеживать изменения исходных файлов и 
 автоматически пересобирать проект:
-	
-	grunt watch
+
+```	
+grunt watch
+```
