@@ -1,0 +1,17 @@
+body, html {
+  background-color: black;
+}
+
+audio {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  top: 0;
+}
+
+.chart div {
+  display : inline-block;
+	background-color: steelblue;
+	margin: 1px;
+	width : 5px;
+}

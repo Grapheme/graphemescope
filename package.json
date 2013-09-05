@@ -1,0 +1,20 @@
+{
+  "name": "Grapheme",
+  "version": "0.0.0",
+  "description": "Grapheme 2.0 - a brand new version of a website",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "demo"
+  ],
+  "author": "grapheme",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt-cli": "~0.1.9",
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-coffee": "~0.7.0"
+  }
+}
