@@ -6,7 +6,7 @@ module.exports = (grunt) ->
       options: 
         livereload : true   
       compile:
-        files : [ "static/css/*", "index.html", "src/*.coffee" ]
+        files : [ "src/*.coffee" ]
         tasks : [ "default" ]
 
     coffee:

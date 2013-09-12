@@ -67,6 +67,7 @@ window.Kaleidoscope = class Kaleidoscope
 
   # Функция отрисовки
   draw: ->
+
     @ctx.fillStyle = @ctx.createPattern @image, "repeat"
     @ctx.save()
 

@@ -10,16 +10,24 @@ body, html {
   padding: 0;
 }
 
-audio {
+.equalizer {
+  position : absolute;
+  top : 0;
+  left : 0;
+  height: 20px;
+  z-index : 1;
+}
+
+/*audio {
   position: absolute;
   z-index: 2;
   right: 0;
   top: 0;
-}
+}*/
 
-.chart div {
+.equalizer div {
   display : inline-block;
-	background-color: steelblue;
+	background-color: #ffffff;
 	margin: 1px;
-	width : 5px;
+	width : 10px;
 }

@@ -1,5 +1,59 @@
 (function() {
+  var AudioAnalyser;
 
+  window.AudioAnalyser = AudioAnalyser = (function() {
+    AudioAnalyser.AudioContext = self.AudioContext || self.webkitAudioContext;
+
+    AudioAnalyser.enabled = AudioAnalyser.AudioContext != null;
+
+    function AudioAnalyser(audio, numBands, smoothing) {
+      var src,
+        _this = this;
+      this.audio = audio != null ? audio : new Audio();
+      this.numBands = numBands != null ? numBands : 256;
+      this.smoothing = smoothing != null ? smoothing : 0.3;
+      if (typeof this.audio === 'string') {
+        src = this.audio;
+        this.audio = new Audio();
+        this.audio.controls = true;
+        this.audio.src = src;
+      }
+      this.context = new AudioAnalyser.AudioContext();
+      this.jsNode = this.context.createJavaScriptNode(2048, 1, 1);
+      this.analyser = this.context.createAnalyser();
+      this.analyser.smoothingTimeConstant = this.smoothing;
+      this.analyser.fftSize = this.numBands * 2;
+      this.bands = new Uint8Array(this.analyser.frequencyBinCount);
+      this.audio.addEventListener('ended', function() {
+        _this.audio.currentTime = 0;
+        return _this.audio.play();
+      });
+      this.audio.addEventListener('canplay', function() {
+        _this.source = _this.context.createMediaElementSource(_this.audio);
+        _this.source.connect(_this.analyser);
+        _this.analyser.connect(_this.jsNode);
+        _this.jsNode.connect(_this.context.destination);
+        _this.source.connect(_this.context.destination);
+        return _this.jsNode.onaudioprocess = function() {
+          _this.analyser.getByteFrequencyData(_this.bands);
+          if (!_this.audio.paused) {
+            return typeof _this.onUpdate === "function" ? _this.onUpdate(_this.bands) : void 0;
+          }
+        };
+      });
+    }
+
+    AudioAnalyser.prototype.start = function() {
+      return this.audio.play();
+    };
+
+    AudioAnalyser.prototype.stop = function() {
+      return this.audio.pause();
+    };
+
+    return AudioAnalyser;
+
+  })();
 
 }).call(this);
 
@@ -46,9 +100,8 @@
 }).call(this);
 
 (function() {
-  $(function() {
-    var container, dragdrop, draw, image, kaleidoscope, resizeHandler;
-    container = document.getElementById("container");
+  window.KaleidoscopeMagic = function(container, imageSource, audioSource) {
+    var NUM_BANDS, SMOOTHING, analyser, analyzeCallback, dragdrop, draw, image, kaleidoscope;
     kaleidoscope = new Kaleidoscope(container);
     dragdrop = new DragDrop(container, /^image/i, function(result) {
       var img;
@@ -57,27 +110,30 @@
       return kaleidoscope.image = img;
     });
     draw = function() {
-      return kaleidoscope.draw()();
+      return kaleidoscope.draw();
     };
     setInterval(draw, 1000 / 30);
     image = new Image();
-    image.src = "http://media-cache-ak0.pinimg.com/736x/4a/77/ab/4a77aba8f172f67c5b34ca672f2f17a2.jpg";
+    image.src = imageSource;
     image.onload = function() {
       return kaleidoscope.image = image;
     };
-    resizeHandler = function() {
-      $("#container").height($(window).height());
-      return $("#container").width($(window).width());
+    NUM_BANDS = 32;
+    SMOOTHING = 0.8;
+    analyzeCallback = function(data) {
+      var primaryBeat, primaryIndex, secondaryBeat, secondaryIndex;
+      primaryIndex = 8;
+      primaryBeat = (+0.1 * data[primaryIndex - 3], +0.5 * data[primaryIndex - 2], +0.9 * data[primaryIndex - 1], +1.0 * data[primaryIndex], +0.9 * data[primaryIndex + 1], +0.5 * data[primaryIndex + 2], +0.1 * data[primaryIndex + 3]);
+      secondaryIndex = 20;
+      secondaryBeat = (+0.1 * data[secondaryIndex - 3], +0.5 * data[secondaryIndex - 2], +0.9 * data[secondaryIndex - 1], +1.0 * data[secondaryIndex], +0.9 * data[secondaryIndex + 1], +0.5 * data[secondaryIndex + 2], +0.1 * data[secondaryIndex + 3]);
+      kaleidoscope.zoomFactor = 1.0 + primaryBeat / 150;
+      return kaleidoscope.angleFactor = secondaryBeat / 300;
     };
-    $(window).mousemove(function(event) {
-      var factorx, factory;
-      factorx = event.pageX / $(window).width();
-      factory = event.pageY / $(window).height();
-      return kaleidoscope.angleFactor = factorx;
-    });
-    $(window).resize(resizeHandler);
-    return $(window).resize();
-  });
+    analyser = new AudioAnalyser(audioSource, NUM_BANDS, SMOOTHING);
+    analyser.onUpdate = analyzeCallback;
+    analyser.start();
+    return document.body.appendChild(analyser.audio);
+  };
 
 }).call(this);
 

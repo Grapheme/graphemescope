@@ -1,7 +1,4 @@
-$ ->
-    container = document.getElementById "container"    
-    
-
+window.KaleidoscopeMagic = (container, imageSource, audioSource) ->
     # Init kaleidoscope
     kaleidoscope = new Kaleidoscope( container )
 
@@ -12,26 +9,52 @@ $ ->
         kaleidoscope.image = img
 
     draw = ->
-        # do kaleidoscope.update()
-        do kaleidoscope.draw()
+        do kaleidoscope.draw
 
     setInterval draw, 1000 / 30
 
     image = new Image()
-    image.src = "http://media-cache-ak0.pinimg.com/736x/4a/77/ab/4a77aba8f172f67c5b34ca672f2f17a2.jpg"
+    image.src = imageSource
     image.onload = ->
         kaleidoscope.image = image
 
-    resizeHandler = ->
-        $("#container").height( $(window).height() )
-        $("#container").width( $(window).width() )
+    NUM_BANDS = 32
+    SMOOTHING = 0.8
 
-    $(window).mousemove (event) ->
-        factorx = event.pageX / $(window).width()
-        factory = event.pageY / $(window).height()
+    analyzeCallback = (data) ->
+        primaryIndex = 8
+        primaryBeat = ( 
+            + 0.1 * data[primaryIndex - 3]
+            + 0.5 * data[primaryIndex - 2]
+            + 0.9 * data[primaryIndex - 1] 
+            + 1.0 * data[primaryIndex]
+            + 0.9 * data[primaryIndex + 1]
+            + 0.5 * data[primaryIndex + 2]
+            + 0.1 * data[primaryIndex + 3]
+        )
 
-        #kaleidoscope.zoomFactor  = 0.9 + 2.0*factorx 
-        kaleidoscope.angleFactor = factorx 
+        secondaryIndex = 20
+        secondaryBeat = ( 
+            + 0.1 * data[secondaryIndex - 3]
+            + 0.5 * data[secondaryIndex - 2]
+            + 0.9 * data[secondaryIndex - 1] 
+            + 1.0 * data[secondaryIndex]
+            + 0.9 * data[secondaryIndex + 1]
+            + 0.5 * data[secondaryIndex + 2]
+            + 0.1 * data[secondaryIndex + 3]
+        )
 
-    $(window).resize resizeHandler
-    $(window).resize()
+        kaleidoscope.zoomFactor = 1.0 + primaryBeat / 150
+        kaleidoscope.angleFactor = secondaryBeat / 300
+
+
+    # setup the audio analyser
+    analyser = new AudioAnalyser audioSource, NUM_BANDS, SMOOTHING
+
+    analyser.onUpdate = analyzeCallback
+
+    # start as soon as the audio is buffered
+    analyser.start();
+
+    # show audio controls
+    document.body.appendChild analyser.audio

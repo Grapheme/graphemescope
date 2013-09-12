@@ -1,68 +1,62 @@
- ########################################################################
-# # Audio Analyzer
-# ########################################################################
-# NUM_BANDS = 32
-# SMOOTHING = 0.6
-# MP3_PATH = 'http://cs1-41v4.vk.me/p23/6496f65050b272.mp3'
-
-
-# ## Audio Analyzer by Justin Windle
-# class AudioAnalyser
+window.AudioAnalyser = class AudioAnalyser
+  @AudioContext: self.AudioContext or self.webkitAudioContext
+  @enabled: @AudioContext?
   
-#   @AudioContext: self.AudioContext or self.webkitAudioContext
-#   @enabled: @AudioContext?
+  constructor: ( @audio = new Audio(), @numBands = 256, @smoothing = 0.3 ) ->
   
-#   constructor: ( @audio = new Audio(), @numBands = 256, @smoothing = 0.3 ) ->
-  
-#     # construct audio object
-#     if typeof @audio is 'string'
+    # construct audio object
+    if typeof @audio is 'string'
       
-#       src = @audio
-#       @audio = new Audio()
-#       @audio.controls = yes
-#       @audio.src = src
+      src = @audio
+      @audio = new Audio()
+      @audio.controls = yes
+      @audio.src = src
   
-#     # setup audio context and nodes
-#     @context = new AudioAnalyser.AudioContext()
+    # setup audio context and nodes
+    @context = new AudioAnalyser.AudioContext()
     
-#     # JavaScriptNode so we can hook onto updates
-#     @jsNode = @context.createJavaScriptNode 2048, 1, 1
+    # JavaScriptNode so we can hook onto updates
+    @jsNode = @context.createJavaScriptNode 2048, 1, 1
     
-#     # smoothed analyser with n bins for frequency-domain analysis
-#     @analyser = @context.createAnalyser()
-#     @analyser.smoothingTimeConstant = @smoothing
-#     @analyser.fftSize = @numBands * 2
+    # smoothed analyser with n bins for frequency-domain analysis
+    @analyser = @context.createAnalyser()
+    @analyser.smoothingTimeConstant = @smoothing
+    @analyser.fftSize = @numBands * 2
     
-#     # persistant bands array
-#     @bands = new Uint8Array @analyser.frequencyBinCount
+    # persistant bands array
+    @bands = new Uint8Array @analyser.frequencyBinCount
 
-#     # circumvent http://crbug.com/112368
-#     @audio.addEventListener 'canplay', =>
+    @audio.addEventListener 'ended', =>
+      @audio.currentTime = 0
+      @audio.play()
+
+    # circumvent http://crbug.com/112368
+    @audio.addEventListener 'canplay', =>
     
-#       # media source
-#       @source = @context.createMediaElementSource @audio
+      # media source
+      @source = @context.createMediaElementSource @audio
 
-#       # wire up nodes
+      # wire up nodes
 
-#       @source.connect @analyser
-#       @analyser.connect @jsNode
+      @source.connect @analyser
+      @analyser.connect @jsNode
 
-#       @jsNode.connect @context.destination
-#       @source.connect @context.destination
+      @jsNode.connect @context.destination
+      @source.connect @context.destination
 
-#       # update each time the JavaScriptNode is called
-#       @jsNode.onaudioprocess = =>
+      # update each time the JavaScriptNode is called
+      @jsNode.onaudioprocess = =>
 
-#         # retreive the data from the first channel
-#         @analyser.getByteFrequencyData @bands
+        # retreive the data from the first channel
+        @analyser.getByteFrequencyData @bands
         
-#         # fire callback
-#         @onUpdate? @bands if not @audio.paused
+        # fire callback
+        @onUpdate? @bands if not @audio.paused
         
-#   start: ->
+  start: ->
   
-#     @audio.play()
+    @audio.play()
     
-#   stop: ->
+  stop: ->
   
-#     @audio.pause()
+    @audio.pause()

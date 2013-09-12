@@ -4,3 +4,4 @@
 */cache/*
 */cache/!index.html
 node_modules
+.DS_Store
