@@ -54,7 +54,7 @@
       return kaleidoscope.draw();
     };
     image = new Image();
-    image.src = "http://behance.vo.llnwd.net/profiles24/1527863/projects/6019601/88640bd21481ee461ae31285d725d47e.jpg";
+    image.src = "http://media-cache-ak0.pinimg.com/736x/4a/77/ab/4a77aba8f172f67c5b34ca672f2f17a2.jpg";
     return image.onload = function() {
       kaleidoscope.image = image;
       return setInterval(draw, 1000 / 30);
@@ -89,7 +89,7 @@
     Kaleidoscope.prototype.resizeHandler = function() {
       this.width = this.domElement.width = this.parentElement.offsetWidth;
       this.height = this.domElement.height = this.parentElement.offsetHeight;
-      this.radius = 0.2 * Math.min(this.width, this.height);
+      this.radius = 0.4 * Math.min(this.width, this.height);
       return this.radiusHeight = 0.5 * Math.sqrt(3) * this.radius;
     };
 
@@ -98,17 +98,17 @@
       this.ctx.save();
       for (cellIndex = _i = 0; _i <= 6; cellIndex = ++_i) {
         this.ctx.save();
-        this.ctx.rotate(cellIndex * 2 * Math.PI / 6);
+        this.ctx.rotate(cellIndex * 2.0 * Math.PI / 6.0);
         this.ctx.scale([-1, 1][cellIndex % 2], 1);
         this.ctx.beginPath();
         this.ctx.moveTo(0, 0);
-        this.ctx.lineTo(-0.5 * this.radius, 1.0 * -this.radiusHeight);
-        this.ctx.lineTo(0.5 * this.radius, 1.0 * -this.radiusHeight);
+        this.ctx.lineTo(-0.5 * this.radius, 1.0 * this.radiusHeight);
+        this.ctx.lineTo(0.5 * this.radius, 1.0 * this.radiusHeight);
         this.ctx.closePath();
         zoomFactor = 0.3;
+        this.ctx.translate(-this.radius * 0.5, 0);
         this.ctx.scale(zoomFactor, zoomFactor);
         this.ctx.fill();
-        this.ctx.stroke();
         this.ctx.restore();
       }
       return this.ctx.restore();
@@ -116,8 +116,6 @@
 
     Kaleidoscope.prototype.draw = function() {
       var h, horizontalLimit, horizontalStrype, v, verticalLimit, verticalStrype, _i, _j, _k, _l, _len, _len1, _results, _results1;
-      this.ctx.fillStyle = "#ff006c";
-      this.ctx.fillRect(0, 0, this.width, this.height);
       this.ctx.fillStyle = this.ctx.createPattern(this.image, "repeat");
       this.ctx.save();
       this.ctx.translate(0.5 * this.width, 0.5 * this.height);

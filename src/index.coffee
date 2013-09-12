@@ -7,15 +7,19 @@ window.onload = ->
     draw = -> do kaleidoscope.draw
     
     image = new Image()
-    image.src = "http://behance.vo.llnwd.net/profiles24/1527863/projects/6019601/88640bd21481ee461ae31285d725d47e.jpg"
+    image.src = "http://media-cache-ak0.pinimg.com/736x/4a/77/ab/4a77aba8f172f67c5b34ca672f2f17a2.jpg"
     
     image.onload = ->
         kaleidoscope.image = image
         setInterval draw, 1000/30
 
+    #cont = document.getElementById "container"
 
-
-
+    # old = window.onresize 
+    # window.onresize = ->
+    #     cont.width  = window.innerWidth
+    #     cont.height = window.innerHeight 
+    #     do old
 
 
      ########################################################################
