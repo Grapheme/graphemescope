@@ -1,24 +1,4 @@
-window.onload = ->
-    console.log "App init"
-
-    # Init kaleidoscope
-    kaleidoscope = new Kaleidoscope( document.getElementById "container" )
-
-    draw = -> do kaleidoscope.draw
-    
-    image = new Image()
-    image.src = "http://behance.vo.llnwd.net/profiles24/1527863/projects/6019601/88640bd21481ee461ae31285d725d47e.jpg"
-    
-    image.onload = ->
-        kaleidoscope.image = image
-        setInterval draw, 1000/30
-
-
-
-
-
-
-     ########################################################################
+ ########################################################################
 # # Audio Analyzer
 # ########################################################################
 # NUM_BANDS = 32

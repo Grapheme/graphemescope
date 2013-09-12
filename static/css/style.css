@@ -2,6 +2,11 @@ body, html {
   background-color: black;
 }
 
+#container {
+	width  : 100%;
+	height : 400px;
+}
+
 audio {
   position: absolute;
   z-index: 2;
