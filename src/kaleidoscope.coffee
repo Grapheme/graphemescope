@@ -1,21 +1,25 @@
-# Параметры движения 
-#   offsetRotation: 0.0
-#   offsetScale: 1.0
-#   offsetX: 0.0
-#   offsetY: 0.0
-#   radius: 260
-#   slices: 12
-#   zoom: 1.0
+# TODO:
+# 1. Поместить центр вращения в центр треугольника
 
+# Калейдоскоп
 window.Kaleidoscope = class Kaleidoscope  
   constructor: ( @parentElement = window.document.body ) ->      
+    @radiusFactor = 1.0
+    @zoomFactor   = 1.0
+    @angleFactor  = 0.0
+
     @domElement ?= document.createElement 'canvas'
     @ctx        ?= @domElement.getContext '2d'
     @image      ?= document.createElement 'img'
     
     @parentElement.appendChild @domElement
-    
-    # Здесь нужно следить за старым обработчиком!
+
+    # Запоминаем старый обработчик события resize
+    @oldResizeHandler = () ->
+
+    if window.onresize != null
+      @oldResizeHandler = window.onresize
+
     window.onresize = () => do @resizeHandler
     do @resizeHandler
 
@@ -24,8 +28,10 @@ window.Kaleidoscope = class Kaleidoscope
     @width  = @domElement.width  = @parentElement.offsetWidth
     @height = @domElement.height = @parentElement.offsetHeight 
 
-    @radius       = 0.4 * Math.min(@width, @height) 
+    @radius       = 0.5 * @radiusFactor * Math.min(@width, @height) 
     @radiusHeight = 0.5 * Math.sqrt(3) * @radius
+
+    do @oldResizeHandler
 
   # Функция рисует одну ячейку (соту) калейдоскопа в центре 
   # системы координат с радиусом @radius 
@@ -47,10 +53,10 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.lineTo  0.5 * @radius, 1.0 * @radiusHeight
       @ctx.closePath()
 
-      # TODO: фиксить здесь!
-      zoomFactor = 0.3
+      zoom = @zoomFactor * @radius / Math.min(@image.width, @image.height)
       @ctx.translate( -@radius * 0.5, 0)
-      @ctx.scale zoomFactor, zoomFactor
+      @ctx.scale zoom, zoom
+      @ctx.rotate @angleFactor * 2 * Math.PI
 
       @ctx.fill()
 

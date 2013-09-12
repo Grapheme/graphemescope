@@ -1,6 +1,6 @@
 window.DragDrop = class DragDrop
   
-  constructor: ( @callback, @context = document, @filter = /^image/i ) ->
+  constructor: (@context, @filter, @callback ) ->
     
     disable = ( event ) ->
       do event.stopPropagation
