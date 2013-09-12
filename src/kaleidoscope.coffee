@@ -1,6 +1,3 @@
-# TODO:
-# 1. Поместить центр вращения в центр треугольника
-
 # Калейдоскоп
 window.Kaleidoscope = class Kaleidoscope  
   constructor: ( @parentElement = window.document.body ) ->      
@@ -48,15 +45,24 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.scale [-1, 1][ cellIndex % 2], 1
       @ctx.beginPath()
 
+      # Рисуем правильный треугольник, вспоминая школьные формулы:
+      # 1. В равнобедренном (то есть и в правильном треугольнике) высота есть и медиана
+      # 2. Высота равна sqrt(3) / 2 стороны треугольника
       @ctx.moveTo 0, 0
       @ctx.lineTo -0.5 * @radius, 1.0 * @radiusHeight
       @ctx.lineTo  0.5 * @radius, 1.0 * @radiusHeight
       @ctx.closePath()
 
+      # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
+      # заполняет треугольник
       zoom = @zoomFactor * @radius / Math.min(@image.width, @image.height)
-      @ctx.translate( -@radius * 0.5, 0)
+      
+      # Помещаем центр вращения в центр треугольника, то есть в центр описанной окружности.
+      # Центр лежит на высоте и делит ее в отношении 2/3
+      @ctx.translate 0, 2/3 * @radiusHeight 
       @ctx.scale zoom, zoom
       @ctx.rotate @angleFactor * 2 * Math.PI
+      @ctx.translate -0.5 * @image.width, -0.5 * @image.height
 
       @ctx.fill()
 
@@ -67,7 +73,6 @@ window.Kaleidoscope = class Kaleidoscope
 
   # Функция отрисовки
   draw: ->
-
     @ctx.fillStyle = @ctx.createPattern @image, "repeat"
     @ctx.save()
 

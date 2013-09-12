@@ -126,9 +126,16 @@
       primaryBeat = (+0.1 * data[primaryIndex - 3], +0.5 * data[primaryIndex - 2], +0.9 * data[primaryIndex - 1], +1.0 * data[primaryIndex], +0.9 * data[primaryIndex + 1], +0.5 * data[primaryIndex + 2], +0.1 * data[primaryIndex + 3]);
       secondaryIndex = 20;
       secondaryBeat = (+0.1 * data[secondaryIndex - 3], +0.5 * data[secondaryIndex - 2], +0.9 * data[secondaryIndex - 1], +1.0 * data[secondaryIndex], +0.9 * data[secondaryIndex + 1], +0.5 * data[secondaryIndex + 2], +0.1 * data[secondaryIndex + 3]);
-      kaleidoscope.zoomFactor = 1.0 + primaryBeat / 150;
-      return kaleidoscope.angleFactor = secondaryBeat / 300;
+      kaleidoscope.zoomFactor = 1.0 + primaryBeat / 30;
+      return kaleidoscope.angleFactor = secondaryBeat / 30;
     };
+    $(window).mousemove(function(event) {
+      var factorx, factory;
+      factorx = event.pageX / $(window).width();
+      factory = event.pageY / $(window).height();
+      kaleidoscope.angleFactor = factorx;
+      return kaleidoscope.zoomFactor = 1.0 + factory;
+    });
     analyser = new AudioAnalyser(audioSource, NUM_BANDS, SMOOTHING);
     analyser.onUpdate = analyzeCallback;
     analyser.start();
@@ -188,9 +195,10 @@
         this.ctx.lineTo(0.5 * this.radius, 1.0 * this.radiusHeight);
         this.ctx.closePath();
         zoom = this.zoomFactor * this.radius / Math.min(this.image.width, this.image.height);
-        this.ctx.translate(-this.radius * 0.5, 0);
+        this.ctx.translate(0, 2 / 3 * this.radiusHeight);
         this.ctx.scale(zoom, zoom);
         this.ctx.rotate(this.angleFactor * 2 * Math.PI);
+        this.ctx.translate(-0.5 * this.image.width, -0.5 * this.image.height);
         this.ctx.fill();
         this.ctx.restore();
       }

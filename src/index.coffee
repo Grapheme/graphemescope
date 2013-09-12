@@ -44,9 +44,16 @@ window.KaleidoscopeMagic = (container, imageSource, audioSource) ->
             + 0.1 * data[secondaryIndex + 3]
         )
 
-        kaleidoscope.zoomFactor = 1.0 + primaryBeat / 150
-        kaleidoscope.angleFactor = secondaryBeat / 300
+        kaleidoscope.zoomFactor = 1.0 + primaryBeat / 30
+        kaleidoscope.angleFactor = secondaryBeat / 30
 
+    $(window).mousemove (event) ->
+
+        factorx = event.pageX / $(window).width()
+        factory = event.pageY / $(window).height()
+
+        kaleidoscope.angleFactor = factorx
+        kaleidoscope.zoomFactor  = 1.0 + factory
 
     # setup the audio analyser
     analyser = new AudioAnalyser audioSource, NUM_BANDS, SMOOTHING
