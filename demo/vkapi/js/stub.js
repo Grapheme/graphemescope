@@ -1,5 +1,4 @@
 $(function() {
-
     VK.init({
         apiId: 3300222
     });
@@ -26,6 +25,11 @@ $(function() {
             kaleidoscope.image = image;
         };
 
+        analyser.audio.src = musicSrc;
+
+        analyser.audio.play();
+    
+
         callback();
     }
 
@@ -43,13 +47,41 @@ $(function() {
             kaleidoscope.draw();
         }, 1000 / 30);
 
+        var NUM_BANDS = 32;
+        var SMOOTHING = 0.5;
+
+        var audioSource = 'https://www.dropbox.com/s/b9sob4lotzq8dru/b11cb80e95acfe.mp3?dl=1';
+
+        var analyzeCallback = function(data) {
+            var windowCoeffs = [0.1, 0.1, 0.8, 1.0, 0.8, 0.5, 0.1];
+
+            var primaryBeat = 0;
+            var secondaryBeat = 0;
+            for(var i = 0; i < windowCoeffs.length; ++i) {
+                primaryBeat += data[10 + i] * windowCoeffs[i];
+                secondaryBeat += data[0  + i] * windowCoeffs[i]; 
+            }
+            // primaryBeat   = (data[10 + i] * windowCoeffs[i]) for i in [0...windowCoeffs.length] 
+            // secondaryBeat = (data[0  + i] * windowCoeffs[i]) for i in [0...windowCoeffs.length]  
+            
+            kaleidoscope.zoomTarget = 1.0 + primaryBeat / 200;
+            kaleidoscope.angleTarget = secondaryBeat    / 500
+        };
+
+        window.analyser = new AudioAnalyser(audioSource, NUM_BANDS, SMOOTHING);
+        analyser.onUpdate = analyzeCallback;
+        analyser.start();
+
 
         function getNext(index) {
             ++index;
 
+            index = _.random(0, 100);
+
             (function() {
             VK.Api.call('wall.get', {
                 offset : index,
+                domain : 'culturegangbang',
                 count  : 1,
                 filter : 'owner'
             }, function(r) {   
@@ -89,23 +121,26 @@ $(function() {
 
                 changeResources(imageSrc, musicSrc, function() {
                     setTimeout(function() {
-                        getNext(index);
-                    }, 2000);
+                       getNext(index);
+                    }, 20000);
                 })
             });
         
             })();
         }
 
-        getNext(-1);
+        getNext(0);
+
+
+
 
         $(window).mousemove(function(event) {
             var factorx = event.pageX / $(window).width();
             var factory = event.pageY / $(window).height();
 
 
-            kaleidoscope.angleTarget = factorx;
-            kaleidoscope.zoomTarget  = 1.0 + 1.0 * factory;
+            //kaleidoscope.angleTarget = factorx;
+            //kaleidoscope.zoomTarget  = 1.0 + 1.0 * factory;
         });
 
         $(window).resize(resizeHandler);
