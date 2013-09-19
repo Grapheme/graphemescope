@@ -8,6 +8,8 @@ window.KaleidoscopeMagic = (container, imageSource, audioSource) ->
         img.src = result
         kaleidoscope.image = img
 
+
+    kaleidoscope.easeEnabled = true
     draw = ->
         do kaleidoscope.draw
 
@@ -19,41 +21,25 @@ window.KaleidoscopeMagic = (container, imageSource, audioSource) ->
         kaleidoscope.image = image
 
     NUM_BANDS = 32
-    SMOOTHING = 0.8
+    SMOOTHING = 0.5
 
     analyzeCallback = (data) ->
-        primaryIndex = 8
-        primaryBeat = ( 
-            + 0.1 * data[primaryIndex - 3]
-            + 0.5 * data[primaryIndex - 2]
-            + 0.9 * data[primaryIndex - 1] 
-            + 1.0 * data[primaryIndex]
-            + 0.9 * data[primaryIndex + 1]
-            + 0.5 * data[primaryIndex + 2]
-            + 0.1 * data[primaryIndex + 3]
-        )
+        windowCoeffs = [0.1, 0.1, 0.8, 1.0, 0.8, 0.5, 0.1];
 
-        secondaryIndex = 20
-        secondaryBeat = ( 
-            + 0.1 * data[secondaryIndex - 3]
-            + 0.5 * data[secondaryIndex - 2]
-            + 0.9 * data[secondaryIndex - 1] 
-            + 1.0 * data[secondaryIndex]
-            + 0.9 * data[secondaryIndex + 1]
-            + 0.5 * data[secondaryIndex + 2]
-            + 0.1 * data[secondaryIndex + 3]
-        )
-
-        kaleidoscope.zoomFactor = 1.0 + primaryBeat / 30
-        kaleidoscope.angleFactor = secondaryBeat / 30
+        primaryBeat   = (data[10 + i] * windowCoeffs[i]) for i in [0...windowCoeffs.length] 
+        secondaryBeat = (data[0  + i] * windowCoeffs[i]) for i in [0...windowCoeffs.length]  
+        
+        kaleidoscope.zoomTarget = 1.0 + primaryBeat / 10
+        kaleidoscope.angleTarget = secondaryBeat    / 50
 
     $(window).mousemove (event) ->
+        # factorx = event.pageX / $(window).width()
+        # factory = event.pageY / $(window).height()
 
-        factorx = event.pageX / $(window).width()
-        factory = event.pageY / $(window).height()
+        # #tr = (Math.atan2 hy, hx) 
 
-        kaleidoscope.angleFactor = factorx
-        kaleidoscope.zoomFactor  = 1.0 + factory
+        # kaleidoscope.angleTarget = factorx
+        # kaleidoscope.zoomTarget  = 1.0 + 1.5 * factory
 
     # setup the audio analyser
     analyser = new AudioAnalyser audioSource, NUM_BANDS, SMOOTHING

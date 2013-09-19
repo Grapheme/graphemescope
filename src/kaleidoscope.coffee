@@ -2,8 +2,19 @@
 window.Kaleidoscope = class Kaleidoscope  
   constructor: ( @parentElement = window.document.body ) ->      
     @radiusFactor = 1.0
+    
+    # Конкретные значения угла и увеличения (используются внутренне)
+    # Меняются от 0 до 1 
     @zoomFactor   = 1.0
     @angleFactor  = 0.0
+
+    # Значения угла и увеличения, доступные из интерфейса
+    @zoomTarget  = 1.2
+    @angleTarget = 0.8 
+
+    # Настройки плавности движения
+    @easeEnabled  = true
+    @ease = 0.1
 
     @domElement ?= document.createElement 'canvas'
     @ctx        ?= @domElement.getContext '2d'
@@ -70,9 +81,20 @@ window.Kaleidoscope = class Kaleidoscope
 
     @ctx.restore()
 
+  update: ->
+    if @easeEnabled
+      # Плавность включена
+      @angleFactor += ( @angleTarget - @angleFactor ) * @ease
+      @zoomFactor  += ( @zoomTarget  - @zoomFactor  ) * @ease
+    else 
+      # Плавность выключена
+      @angleFactor = @angleTarget
+      @zoomFactor  = @zoomTarget
 
   # Функция отрисовки
   draw: ->
+    @update()
+    
     @ctx.fillStyle = @ctx.createPattern @image, "repeat"
     @ctx.save()
 

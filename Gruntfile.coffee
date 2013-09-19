@@ -12,7 +12,7 @@ module.exports = (grunt) ->
     coffee:
       compile:
         files:
-          "static/js/graphemescope.js" : [ "src/*.coffee" ]
+          "lib/graphemescope.js" : [ "src/*.coffee" ]
 
 
   grunt.loadNpmTasks "grunt-contrib-coffee"
