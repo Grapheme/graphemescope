@@ -100,16 +100,9 @@
 }).call(this);
 
 (function() {
-  window.KaleidoscopeMagic = function(container, imageSource, audioSource) {
-    var NUM_BANDS, SMOOTHING, analyser, analyzeCallback, dragdrop, draw, image, kaleidoscope;
+  window.Graphemescope = function(container, imageSource, audioSource) {
+    var NUM_BANDS, SMOOTHING, analyser, analyzeCallback, draw, image, kaleidoscope;
     kaleidoscope = new Kaleidoscope(container);
-    dragdrop = new DragDrop(container, /^image/i, function(result) {
-      var img;
-      img = new Image;
-      img.src = result;
-      return kaleidoscope.image = img;
-    });
-    kaleidoscope.easeEnabled = true;
     draw = function() {
       return kaleidoscope.draw();
     };
@@ -133,11 +126,9 @@
       kaleidoscope.zoomTarget = 1.0 + primaryBeat / 10;
       return kaleidoscope.angleTarget = secondaryBeat / 50;
     };
-    $(window).mousemove(function(event) {});
     analyser = new AudioAnalyser(audioSource, NUM_BANDS, SMOOTHING);
     analyser.onUpdate = analyzeCallback;
-    analyser.start();
-    return document.body.appendChild(analyser.audio);
+    return analyser.start();
   };
 
 }).call(this);
