@@ -1,15 +1,13 @@
-window.KaleidoscopeMagic = (container, imageSource, audioSource) ->
+window.Graphemescope = (container, imageSource, audioSource) ->
     # Init kaleidoscope
     kaleidoscope = new Kaleidoscope( container )
 
-    # Init Drag'n'Drop 
-    dragdrop = new DragDrop container, /^image/i, (result) ->
-        img = new Image
-        img.src = result
-        kaleidoscope.image = img
+    # # Init Drag'n'Drop 
+    # dragdrop = new DragDrop container, /^image/i, (result) ->
+    #     img = new Image
+    #     img.src = result
+    #     kaleidoscope.image = img
 
-
-    kaleidoscope.easeEnabled = true
     draw = ->
         do kaleidoscope.draw
 

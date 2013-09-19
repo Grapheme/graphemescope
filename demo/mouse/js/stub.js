@@ -1,6 +1,5 @@
 	$(function() {
-	var imagePath = "../resources/3.jpg";
-	var mp3Path   = "../resources/2.mp3";
+	var imagePath = "img/pattern.jpg";
 
 	var container = $("#container");
 
