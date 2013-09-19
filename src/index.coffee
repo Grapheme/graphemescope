@@ -48,4 +48,4 @@ window.Graphemescope = (container, imageSource, audioSource) ->
     analyser.start();
 
     # show audio controls
-    #document.body.appendChild analyser.audio
+    document.body.appendChild analyser.audio
