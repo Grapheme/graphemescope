@@ -30,7 +30,7 @@ window.Graphemescope = (container, imageSource, audioSource) ->
         kaleidoscope.zoomTarget = 1.0 + primaryBeat / 10
         kaleidoscope.angleTarget = secondaryBeat    / 50
 
-    $(window).mousemove (event) ->
+    # $(window).mousemove (event) ->
         # factorx = event.pageX / $(window).width()
         # factory = event.pageY / $(window).height()
 
