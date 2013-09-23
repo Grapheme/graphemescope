@@ -1,25 +1,24 @@
 window.DragDrop = class DragDrop
   
-  constructor: (@context, @filter, @callback ) ->
+  constructor: (@context, @onDrop ) ->
     
     disable = ( event ) ->
       do event.stopPropagation
       do event.preventDefault
     
-    @context.addEventListener 'dragleave', disable
-    @context.addEventListener 'dragenter', disable
-    @context.addEventListener 'dragover', disable
-    @context.addEventListener 'drop', @onDrop, no
+    @context.addEventListener 'dragleave', (event) =>
+      disable event
+      @onLeave? event
+
+    @context.addEventListener 'dragenter', (event) =>
+      disable event
+      @onEnter? event
+
+    @context.addEventListener 'dragover', (event) =>
+      disable event 
+      @onOver? event
+
+    @context.addEventListener 'drop', (event) =>
+      disable event
+      @onDrop? event.dataTransfer.files
       
-  onDrop: ( event ) =>
-    
-    do event.stopPropagation
-    do event.preventDefault
-      
-    file = event.dataTransfer.files[0]
-    
-    if @filter.test file.type
-      
-      reader = new FileReader
-      reader.onload = ( event ) => @callback? event.target.result
-      reader.readAsDataURL file

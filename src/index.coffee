@@ -2,12 +2,6 @@ window.Graphemescope = (container, imageSource, audioSource) ->
     # Init kaleidoscope
     kaleidoscope = new Kaleidoscope( container )
 
-    # # Init Drag'n'Drop 
-    # dragdrop = new DragDrop container, /^image/i, (result) ->
-    #     img = new Image
-    #     img.src = result
-    #     kaleidoscope.image = img
-
     draw = ->
         do kaleidoscope.draw
 
@@ -29,15 +23,6 @@ window.Graphemescope = (container, imageSource, audioSource) ->
         
         kaleidoscope.zoomTarget = 1.0 + primaryBeat / 10
         kaleidoscope.angleTarget = secondaryBeat    / 50
-
-    # $(window).mousemove (event) ->
-        # factorx = event.pageX / $(window).width()
-        # factory = event.pageY / $(window).height()
-
-        # #tr = (Math.atan2 hy, hx) 
-
-        # kaleidoscope.angleTarget = factorx
-        # kaleidoscope.zoomTarget  = 1.0 + 1.5 * factory
 
     # setup the audio analyser
     analyser = new AudioAnalyser audioSource, NUM_BANDS, SMOOTHING

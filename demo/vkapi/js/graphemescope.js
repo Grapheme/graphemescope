@@ -58,40 +58,35 @@
 }).call(this);
 
 (function() {
-  var DragDrop,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var DragDrop;
 
   window.DragDrop = DragDrop = (function() {
-    function DragDrop(context, filter, callback) {
-      var disable;
+    function DragDrop(context, onDrop) {
+      var disable,
+        _this = this;
       this.context = context;
-      this.filter = filter;
-      this.callback = callback;
-      this.onDrop = __bind(this.onDrop, this);
+      this.onDrop = onDrop;
       disable = function(event) {
         event.stopPropagation();
         return event.preventDefault();
       };
-      this.context.addEventListener('dragleave', disable);
-      this.context.addEventListener('dragenter', disable);
-      this.context.addEventListener('dragover', disable);
-      this.context.addEventListener('drop', this.onDrop, false);
+      this.context.addEventListener('dragleave', function(event) {
+        disable(event);
+        return typeof _this.onLeave === "function" ? _this.onLeave(event) : void 0;
+      });
+      this.context.addEventListener('dragenter', function(event) {
+        disable(event);
+        return typeof _this.onEnter === "function" ? _this.onEnter(event) : void 0;
+      });
+      this.context.addEventListener('dragover', function(event) {
+        disable(event);
+        return typeof _this.onOver === "function" ? _this.onOver(event) : void 0;
+      });
+      this.context.addEventListener('drop', function(event) {
+        disable(event);
+        return typeof _this.onDrop === "function" ? _this.onDrop(event.dataTransfer.files) : void 0;
+      });
     }
-
-    DragDrop.prototype.onDrop = function(event) {
-      var file, reader,
-        _this = this;
-      event.stopPropagation();
-      event.preventDefault();
-      file = event.dataTransfer.files[0];
-      if (this.filter.test(file.type)) {
-        reader = new FileReader;
-        reader.onload = function(event) {
-          return typeof _this.callback === "function" ? _this.callback(event.target.result) : void 0;
-        };
-        return reader.readAsDataURL(file);
-      }
-    };
 
     return DragDrop;
 
