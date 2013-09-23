@@ -1,7 +1,7 @@
 {
-  "name": "Grapheme",
+  "name": "graphemescope",
   "version": "0.0.0",
-  "description": "Grapheme 2.0 - a brand new version of a website",
+  "description": "Graphemescope - is a library, that contains bunch of methods to create dynamic kaleidoscopic visualizations using HTML5 APIs",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
