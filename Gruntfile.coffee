@@ -14,8 +14,16 @@ module.exports = (grunt) ->
         files:
           "lib/graphemescope.js" : [ "src/*.coffee" ]
 
+    copy:
+      compile:
+        files: [
+            src  : "lib/graphemescope.js",
+            dest : "demo/vkapi/js/"
+        ]
+
 
   grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-contrib-watch"
+  grunt.loadNpmTasks "grunt-contrib-copy"
 
-  grunt.registerTask "default", [ "coffee" ]
+  grunt.registerTask "default", [ "coffee", "copy" ]
