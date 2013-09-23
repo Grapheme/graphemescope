@@ -16,16 +16,19 @@ $(function() {
     $('#login_button').click(function() {
         VK.Auth.login(authInfo);
     });
-    
 
-    function changeResources(imageSrc, musicSrc, callback) {
+
+    function changeResources(imageSrc, music, callback) {
         var image = new Image();
         image.src = imageSrc;
         image.onload = function() {
             kaleidoscope.image = image;
         };
 
-        analyser.audio.src = musicSrc;
+
+        $('#music-title').text(music.artist + " - " + music.title);
+
+        analyser.audio.src = music.url;
 
         analyser.audio.play();
     
@@ -35,6 +38,11 @@ $(function() {
 
     function apiInitialized() {
         var container = $("#container");
+
+
+    container.click(function() {
+        getNext(0);
+    });
 
         resizeHandler = function() {
             container.height( $(window).height() );
@@ -76,12 +84,12 @@ $(function() {
         function getNext(index) {
             ++index;
 
-            index = _.random(0, 100);
+            index = _.random(0, 200);
 
             (function() {
             VK.Api.call('wall.get', {
                 offset : index,
-                domain : 'culturegangbang',
+                domain : 'molefrog',
                 count  : 1,
                 filter : 'owner'
             }, function(r) {   
@@ -106,7 +114,7 @@ $(function() {
                         return (a.type == 'audio');
                     })
                     .map(function(a) {
-                        return a.audio.url;
+                        return a.audio;
                     })
                     .shuffle()
                     .value();
@@ -121,8 +129,8 @@ $(function() {
 
                 changeResources(imageSrc, musicSrc, function() {
                     setTimeout(function() {
-                       getNext(index);
-                    }, 20000);
+                      // getNext(index);
+                    }, 60000);
                 })
             });
         
