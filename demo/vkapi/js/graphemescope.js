@@ -128,7 +128,8 @@
     };
     analyser = new AudioAnalyser(audioSource, NUM_BANDS, SMOOTHING);
     analyser.onUpdate = analyzeCallback;
-    return analyser.start();
+    analyser.start();
+    return document.body.appendChild(analyser.audio);
   };
 
 }).call(this);

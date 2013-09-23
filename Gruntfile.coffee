@@ -17,7 +17,9 @@ module.exports = (grunt) ->
     copy:
       compile:
         files: [
-            src  : "lib/graphemescope.js",
+            expand : true
+            src  : "graphemescope.js"
+            cwd  : "lib/"
             dest : "demo/vkapi/js/"
         ]
 
