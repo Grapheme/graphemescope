@@ -2,11 +2,6 @@ window.Graphemescope = (container, imageSource, audioSource) ->
     # Init kaleidoscope
     kaleidoscope = new Kaleidoscope( container )
 
-    draw = ->
-        do kaleidoscope.draw
-
-    setInterval draw, 1000 / 30
-
     image = new Image()
     image.src = imageSource
     image.onload = ->

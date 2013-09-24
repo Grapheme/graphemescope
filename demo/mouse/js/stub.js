@@ -35,9 +35,9 @@
         kaleidoscope.setImage(img);
     }, 3000);
        
-    setInterval(function() {
-    	kaleidoscope.draw();
-    }, 1000 / 30);
+    // setInterval(function() {
+    // 	kaleidoscope.draw();
+    // }, 1000 / 30);
 
     var image = new Image();
     image.src = imagePath;
