@@ -20,13 +20,20 @@
             reader.onload = function(event) {
                 var img = new Image();
                 img.src = event.target.result;
-                kaleidoscope.image = img;
+                kaleidoscope.setImage(img);
             };
 
             reader.readAsDataURL(file);
         } 
       
     });
+
+
+    setTimeout(function() {
+        var img = new Image();
+        img.src = "img/pattern-change.jpg";
+        kaleidoscope.setImage(img);
+    }, 3000);
        
     setInterval(function() {
     	kaleidoscope.draw();
@@ -35,7 +42,7 @@
     var image = new Image();
     image.src = imagePath;
     image.onload = function() {
-        kaleidoscope.image = image;
+        kaleidoscope.setImage(image);
     };
 
     $(window).mousemove(function(event) {

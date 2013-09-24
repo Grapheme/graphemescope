@@ -10,7 +10,7 @@ window.Graphemescope = (container, imageSource, audioSource) ->
     image = new Image()
     image.src = imageSource
     image.onload = ->
-        kaleidoscope.image = image
+        kaleidoscope.setImage(image)
 
     NUM_BANDS = 32
     SMOOTHING = 0.5

@@ -16,10 +16,15 @@ window.Kaleidoscope = class Kaleidoscope
     @easeEnabled  = true
     @ease = 0.1
 
-    @domElement ?= document.createElement 'canvas'
-    @ctx        ?= @domElement.getContext '2d'
-    @image      ?= document.createElement 'img'
-    
+    @domElement ?= document.createElement "canvas"
+    @ctx        ?= @domElement.getContext "2d"
+
+    @image      ?= document.createElement "img"
+    @imageProxy ?= document.createElement "img"
+
+    @alphaFactor = 1.0
+    @alphaTarget = 1.0
+
     @parentElement.appendChild @domElement
 
     # Запоминаем старый обработчик события resize
@@ -41,6 +46,25 @@ window.Kaleidoscope = class Kaleidoscope
 
     do @oldResizeHandler
 
+  # Функция рисует заданную картинку в центре правильного треугольника
+  drawImage : (image, alpha) ->
+    @ctx.save()
+    # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
+    # заполняет треугольник
+    zoom = @zoomFactor * @radius / Math.min(image.width, image.height)
+
+    # Помещаем центр вращения в центр треугольника, то есть в центр описанной окружности.
+    # Центр лежит на высоте и делит ее в отношении 2/3
+    @ctx.translate 0, 2/3 * @radiusHeight 
+    @ctx.scale zoom, zoom
+    @ctx.rotate @angleFactor * 2 * Math.PI
+    @ctx.translate -0.5 * image.width, -0.5 * image.height
+
+    @ctx.globalAlpha = alpha
+    @ctx.fillStyle = @ctx.createPattern image, "repeat"
+    @ctx.fill()
+    @ctx.restore()
+
   # Функция рисует одну ячейку (соту) калейдоскопа в центре 
   # системы координат с радиусом @radius 
   drawCell : ->
@@ -48,7 +72,7 @@ window.Kaleidoscope = class Kaleidoscope
 
     # Сота состоит из 6 лепестков, каждый лепесток - 
     # равносторонний треугольник с радиусом @radius
-    for cellIndex in [ 0..6 ]
+    for cellIndex in [ 0...6 ]
       @ctx.save()
       @ctx.rotate(cellIndex * 2.0 * Math.PI / 6.0)
 
@@ -64,18 +88,9 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.lineTo  0.5 * @radius, 1.0 * @radiusHeight
       @ctx.closePath()
 
-      # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
-      # заполняет треугольник
-      zoom = @zoomFactor * @radius / Math.min(@image.width, @image.height)
-      
-      # Помещаем центр вращения в центр треугольника, то есть в центр описанной окружности.
-      # Центр лежит на высоте и делит ее в отношении 2/3
-      @ctx.translate 0, 2/3 * @radiusHeight 
-      @ctx.scale zoom, zoom
-      @ctx.rotate @angleFactor * 2 * Math.PI
-      @ctx.translate -0.5 * @image.width, -0.5 * @image.height
-
-      @ctx.fill()
+      # Рисуем две картинки: основную и заднюю для эмуляции эффекта плавного перехода
+      @drawImage(@image, @alphaFactor)
+      @drawImage(@imageProxy, 1 - @alphaFactor)
 
       @ctx.restore()
 
@@ -86,16 +101,18 @@ window.Kaleidoscope = class Kaleidoscope
       # Плавность включена
       @angleFactor += ( @angleTarget - @angleFactor ) * @ease
       @zoomFactor  += ( @zoomTarget  - @zoomFactor  ) * @ease
+      @alphaFactor += ( @alphaTarget - @alphaFactor ) * @ease 
     else 
       # Плавность выключена
       @angleFactor = @angleTarget
       @zoomFactor  = @zoomTarget
+      @alphaFactor = @alphaTarget
+
 
   # Функция отрисовки
   draw: ->
     @update()
     
-    @ctx.fillStyle = @ctx.createPattern @image, "repeat"
     @ctx.save()
 
     # Перемещаемся в центр
@@ -112,7 +129,6 @@ window.Kaleidoscope = class Kaleidoscope
 
     for v in verticalStrype
       @ctx.save()
-
       @ctx.translate 0, @radiusHeight * v
       
       # Сдвиг у нечетных слоев
@@ -130,6 +146,10 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.restore()  
     @ctx.restore()
 
+  setImage : (image) ->
+    @imageProxy = @image
+    @image = image
+    @alphaFactor = 0.0
 
 
 

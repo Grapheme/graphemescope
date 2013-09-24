@@ -105,7 +105,7 @@
     image = new Image();
     image.src = imageSource;
     image.onload = function() {
-      return kaleidoscope.image = image;
+      return kaleidoscope.setImage(image);
     };
     NUM_BANDS = 32;
     SMOOTHING = 0.5;
@@ -144,14 +144,19 @@
       this.easeEnabled = true;
       this.ease = 0.1;
       if (this.domElement == null) {
-        this.domElement = document.createElement('canvas');
+        this.domElement = document.createElement("canvas");
       }
       if (this.ctx == null) {
-        this.ctx = this.domElement.getContext('2d');
+        this.ctx = this.domElement.getContext("2d");
       }
       if (this.image == null) {
-        this.image = document.createElement('img');
+        this.image = document.createElement("img");
       }
+      if (this.imageProxy == null) {
+        this.imageProxy = document.createElement("img");
+      }
+      this.alphaFactor = 1.0;
+      this.alphaTarget = 1.0;
       this.parentElement.appendChild(this.domElement);
       this.oldResizeHandler = function() {};
       if (window.onresize !== null) {
@@ -171,10 +176,24 @@
       return this.oldResizeHandler();
     };
 
-    Kaleidoscope.prototype.drawCell = function() {
-      var cellIndex, zoom, _i;
+    Kaleidoscope.prototype.drawImage = function(image, alpha) {
+      var zoom;
       this.ctx.save();
-      for (cellIndex = _i = 0; _i <= 6; cellIndex = ++_i) {
+      zoom = this.zoomFactor * this.radius / Math.min(image.width, image.height);
+      this.ctx.translate(0, 2 / 3 * this.radiusHeight);
+      this.ctx.scale(zoom, zoom);
+      this.ctx.rotate(this.angleFactor * 2 * Math.PI);
+      this.ctx.translate(-0.5 * image.width, -0.5 * image.height);
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillStyle = this.ctx.createPattern(image, "repeat");
+      this.ctx.fill();
+      return this.ctx.restore();
+    };
+
+    Kaleidoscope.prototype.drawCell = function() {
+      var cellIndex, _i;
+      this.ctx.save();
+      for (cellIndex = _i = 0; _i < 6; cellIndex = ++_i) {
         this.ctx.save();
         this.ctx.rotate(cellIndex * 2.0 * Math.PI / 6.0);
         this.ctx.scale([-1, 1][cellIndex % 2], 1);
@@ -183,12 +202,8 @@
         this.ctx.lineTo(-0.5 * this.radius, 1.0 * this.radiusHeight);
         this.ctx.lineTo(0.5 * this.radius, 1.0 * this.radiusHeight);
         this.ctx.closePath();
-        zoom = this.zoomFactor * this.radius / Math.min(this.image.width, this.image.height);
-        this.ctx.translate(0, 2 / 3 * this.radiusHeight);
-        this.ctx.scale(zoom, zoom);
-        this.ctx.rotate(this.angleFactor * 2 * Math.PI);
-        this.ctx.translate(-0.5 * this.image.width, -0.5 * this.image.height);
-        this.ctx.fill();
+        this.drawImage(this.image, this.alphaFactor);
+        this.drawImage(this.imageProxy, 1 - this.alphaFactor);
         this.ctx.restore();
       }
       return this.ctx.restore();
@@ -197,17 +212,18 @@
     Kaleidoscope.prototype.update = function() {
       if (this.easeEnabled) {
         this.angleFactor += (this.angleTarget - this.angleFactor) * this.ease;
-        return this.zoomFactor += (this.zoomTarget - this.zoomFactor) * this.ease;
+        this.zoomFactor += (this.zoomTarget - this.zoomFactor) * this.ease;
+        return this.alphaFactor += (this.alphaTarget - this.alphaFactor) * this.ease;
       } else {
         this.angleFactor = this.angleTarget;
-        return this.zoomFactor = this.zoomTarget;
+        this.zoomFactor = this.zoomTarget;
+        return this.alphaFactor = this.alphaTarget;
       }
     };
 
     Kaleidoscope.prototype.draw = function() {
       var h, horizontalLimit, horizontalStrype, v, verticalLimit, verticalStrype, _i, _j, _k, _l, _len, _len1, _results, _results1;
       this.update();
-      this.ctx.fillStyle = this.ctx.createPattern(this.image, "repeat");
       this.ctx.save();
       this.ctx.translate(0.5 * this.width, 0.5 * this.height);
       verticalLimit = Math.ceil(0.5 * this.height / this.radiusHeight);
@@ -239,6 +255,12 @@
         this.ctx.restore();
       }
       return this.ctx.restore();
+    };
+
+    Kaleidoscope.prototype.setImage = function(image) {
+      this.imageProxy = this.image;
+      this.image = image;
+      return this.alphaFactor = 0.0;
     };
 
     return Kaleidoscope;
