@@ -22,17 +22,15 @@ $(function() {
         var image = new Image();
         image.src = imageSrc;
         image.onload = function() {
-            kaleidoscope.image = image;
+            kaleidoscope.setImage(image);
         };
 
 
         $('#music-title').text(music.artist + " - " + music.title);
 
         analyser.audio.src = music.url;
-
         analyser.audio.play();
-    
-
+        analyser.onEnded = getNext;
         callback();
     }
 
@@ -51,14 +49,10 @@ $(function() {
 
         window.kaleidoscope = new Kaleidoscope( container[0] );
 
-        setInterval(function() {
-            kaleidoscope.draw();
-        }, 1000 / 30);
-
         var NUM_BANDS = 32;
         var SMOOTHING = 0.5;
 
-        var audioSource = 'https://www.dropbox.com/s/b9sob4lotzq8dru/b11cb80e95acfe.mp3?dl=1';
+        var audioSource = '';
 
         var analyzeCallback = function(data) {
             var windowCoeffs = [0.1, 0.1, 0.8, 1.0, 0.8, 0.5, 0.1];
@@ -81,9 +75,7 @@ $(function() {
         analyser.start();
 
 
-        function getNext(index) {
-            ++index;
-
+        window.getNext = function getNext() {
             index = _.random(0, 200);
 
             (function() {
@@ -126,18 +118,14 @@ $(function() {
                 var imageSrc = photos[0];
                 var musicSrc = music[0];
 
-
-                changeResources(imageSrc, musicSrc, function() {
-                    setTimeout(function() {
-                      // getNext(index);
-                    }, 60000);
-                })
+                console.log(imageSrc);
+                changeResources(imageSrc, musicSrc, function() {});
             });
         
             })();
         }
 
-        getNext(0);
+        getNext();
 
 
 
@@ -145,10 +133,6 @@ $(function() {
         $(window).mousemove(function(event) {
             var factorx = event.pageX / $(window).width();
             var factory = event.pageY / $(window).height();
-
-
-            //kaleidoscope.angleTarget = factorx;
-            //kaleidoscope.zoomTarget  = 1.0 + 1.0 * factory;
         });
 
         $(window).resize(resizeHandler);

@@ -25,6 +25,9 @@
       this.analyser.fftSize = this.numBands * 2;
       this.bands = new Uint8Array(this.analyser.frequencyBinCount);
       this.audio.addEventListener('ended', function() {
+        if (typeof _this.onEnded === "function") {
+          _this.onEnded();
+        }
         _this.audio.currentTime = 0;
         return _this.audio.play();
       });
@@ -96,12 +99,8 @@
 
 (function() {
   window.Graphemescope = function(container, imageSource, audioSource) {
-    var NUM_BANDS, SMOOTHING, analyser, analyzeCallback, draw, image, kaleidoscope;
+    var NUM_BANDS, SMOOTHING, analyser, analyzeCallback, image, kaleidoscope;
     kaleidoscope = new Kaleidoscope(container);
-    draw = function() {
-      return kaleidoscope.draw();
-    };
-    setInterval(draw, 1000 / 30);
     image = new Image();
     image.src = imageSource;
     image.onload = function() {
@@ -130,12 +129,19 @@
 }).call(this);
 
 (function() {
-  var Kaleidoscope;
+  var Kaleidoscope, requestAnimFrame;
+
+  requestAnimFrame = (function() {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
+      return window.setTimeout(callback, 1000 / 24);
+    };
+  })();
 
   window.Kaleidoscope = Kaleidoscope = (function() {
     function Kaleidoscope(parentElement) {
       var _this = this;
       this.parentElement = parentElement != null ? parentElement : window.document.body;
+      this.enabled = true;
       this.radiusFactor = 1.0;
       this.zoomFactor = 1.0;
       this.angleFactor = 0.0;
@@ -166,7 +172,21 @@
         return _this.resizeHandler();
       };
       this.resizeHandler();
+      requestAnimFrame(function() {
+        return _this.animationFrame();
+      });
     }
+
+    Kaleidoscope.prototype.animationFrame = function() {
+      var _this = this;
+      requestAnimFrame(function() {
+        return _this.animationFrame();
+      });
+      if (this.enabled) {
+        this.update();
+        return this.draw();
+      }
+    };
 
     Kaleidoscope.prototype.resizeHandler = function() {
       this.width = this.domElement.width = this.parentElement.offsetWidth;
@@ -223,7 +243,6 @@
 
     Kaleidoscope.prototype.draw = function() {
       var h, horizontalLimit, horizontalStrype, v, verticalLimit, verticalStrype, _i, _j, _k, _l, _len, _len1, _results, _results1;
-      this.update();
       this.ctx.save();
       this.ctx.translate(0.5 * this.width, 0.5 * this.height);
       verticalLimit = Math.ceil(0.5 * this.height / this.radiusHeight);

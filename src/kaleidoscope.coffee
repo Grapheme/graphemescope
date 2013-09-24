@@ -1,6 +1,18 @@
+
+# Polyfill for requestAnimationFrame function
+# http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
+requestAnimFrame = (->
+  window.requestAnimationFrame || 
+  window.webkitRequestAnimationFrame || 
+  window.mozRequestAnimationFrame || (callback) ->
+    # It is reasonable to use 24 fps for old browsers
+    window.setTimeout callback, (1000 / 24) 
+)()
+
 # Калейдоскоп
 window.Kaleidoscope = class Kaleidoscope  
-  constructor: ( @parentElement = window.document.body ) ->      
+  constructor: ( @parentElement = window.document.body ) ->    
+    @enabled = true  
     @radiusFactor = 1.0
     
     # Конкретные значения угла и увеличения (используются внутренне)
@@ -35,6 +47,14 @@ window.Kaleidoscope = class Kaleidoscope
 
     window.onresize = () => do @resizeHandler
     do @resizeHandler
+
+    requestAnimFrame => do @animationFrame
+
+  animationFrame : ->
+    requestAnimFrame => do @animationFrame
+    if @enabled
+      do @update
+      do @draw
 
   # Обработчик resize события
   resizeHandler : ->
@@ -111,8 +131,6 @@ window.Kaleidoscope = class Kaleidoscope
 
   # Функция отрисовки
   draw: ->
-    @update()
-    
     @ctx.save()
 
     # Перемещаемся в центр

@@ -27,6 +27,7 @@ window.AudioAnalyser = class AudioAnalyser
     @bands = new Uint8Array @analyser.frequencyBinCount
 
     @audio.addEventListener 'ended', =>
+      @onEnded?()
       @audio.currentTime = 0
       @audio.play()
 
