@@ -1,4 +1,7 @@
 window.addEventListener("load", function() {
+
+    
+
   	var imagePath = "img/pattern.jpg";
     var musicPath = "audio/music.mp3";
 
@@ -12,11 +15,14 @@ window.addEventListener("load", function() {
     $(window).resize(resizeHandler);
     $(window).resize();
 
-    var scope = new Graphemescope(container[0], imagePath, musicPath);
+    var scope = new Graphemescope(container[0]);
+    scope.setImage(imagePath);
+    scope.setAudio(musicPath);
+
 
     var toggle = true;
 
-    $(window).click(function() {
+    $(container).click(function() {
       toggle = !toggle;
 
       if(toggle) {

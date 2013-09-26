@@ -1,6 +1,6 @@
 $(function() {
     container = $("#container");
-    window.scope = new Graphemescope( container[0], "", "");
+    window.scope = new Graphemescope( container[0] );
 
     resizeHandler = function() {
         container.height( $(window).height() );
@@ -13,8 +13,8 @@ $(function() {
         var image = new Image();
         image.src = imageSrc;
         image.onload = function() {
-            scope.kaleidoscope.setImage(image);
-            scope.analyser.setAudio(music.url);
+            scope.setImage(image);
+            scope.setAudio(music.url);
                 $('#music-title').html(music.artist + " - " + music.title);
     
             callback();
@@ -41,7 +41,7 @@ $(function() {
     });
 
 
-
+    var totalCount = 0;
 
     function apiInitialized() {
         container.click(function() {
@@ -50,18 +50,20 @@ $(function() {
 
 
         getNext = function getNext() {
-            index = _.random(0, 200);
+            var index = _.random(0, totalCount);
+            
 
-            (function() {
             VK.Api.call('wall.get', {
                 offset : index,
                 domain : 'molefrog',
                 count  : 1,
                 filter : 'owner'
             }, function(r) {   
+                totalCount = r.response[0];
                 if(!(r.response && r.response[1] && r.response[1].attachments)) {
-                    return getNext(index);
+                    return getNext();
                 }   
+
 
                 var att = r.response[1].attachments;
 
@@ -95,14 +97,8 @@ $(function() {
 
                 changeResources(imageSrc, musicSrc, function() {});
             });
-        
-            })();
         }
 
         getNext();
-
    } 
-
-
-
 });

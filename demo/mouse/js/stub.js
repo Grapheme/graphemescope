@@ -1,9 +1,8 @@
 $(function() {
 	var container = $("#container");
 
-    var kaleidoscope = new Kaleidoscope(container[0]);
+    scope = new Graphemescope( container[0] );
 
-    // Init Drag'n'Drop 
     var dragdrop = new DragDrop(container[0],  function (files) {
         var filter = /^image/i;
         var file = files[0];
@@ -13,7 +12,7 @@ $(function() {
             reader.onload = function(event) {
                 var img = new Image();
                 img.src = event.target.result;
-                kaleidoscope.setImage(img);
+                scope.kaleidoscope.setImage(img);
             };
 
             reader.readAsDataURL(file);
@@ -27,11 +26,7 @@ $(function() {
     function changePicture() {
         var imagePath = "img/pattern-" + index + ".jpg";
 
-        var image = new Image();
-        image.src = imagePath;
-        image.onload = function() {
-            kaleidoscope.setImage(image);
-        };
+        scope.setImage(imagePath);
 
         index = (index + 1) % imageCount;
     }
@@ -42,8 +37,8 @@ $(function() {
 		var factorx = event.pageX / $(window).width();
 		var factory = event.pageY / $(window).height();
 
-		kaleidoscope.angleTarget = factorx;
-		kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
+		scope.kaleidoscope.angleTarget = factorx;
+		scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
     });
 
     $(window).click(changePicture);
