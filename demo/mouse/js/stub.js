@@ -1,4 +1,6 @@
 $(function() {
+    window.leapEnabled = false;
+
 	var container = $("#container");
 
     scope = new Graphemescope( container[0] );
@@ -37,8 +39,10 @@ $(function() {
 		var factorx = event.pageX / $(window).width();
 		var factory = event.pageY / $(window).height();
 
-		scope.kaleidoscope.angleTarget = factorx;
-		scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
+        if(!leapEnabled) {
+            scope.kaleidoscope.angleTarget = factorx;
+            scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
+        }
     });
 
     $(window).click(changePicture);
@@ -50,4 +54,70 @@ $(function() {
 
 	$(window).resize(resizeHandler);
 	$(window).resize();
+
+    var throttledChange = _(changePicture).throttle(1000, {leading: false});
+
+
+    var controller = new Leap.Controller({ enableGestures : true });
+
+
+    controller.on('deviceDisconnected', function() {
+        console.log("Leap Motion has been disconnected");
+        leapEnabled = false;
+    });
+
+    controller.on('deviceConnected', function() {
+        console.log("Leap Motion is connected");
+        leapEnabled = true;
+    });
+
+    controller.on('ready', function() {
+        console.log("Leap Motion is ready");
+        leapEnabled = true;
+    });
+
+
+    function leapToScene( frame, leapPos ) {
+      var iBox = frame.interactionBox;
+
+      var left = iBox.center[0] - iBox.size[0]/2;
+      var top = iBox.center[1] + iBox.size[1]/2;
+
+      var x = leapPos[0] - left;
+      var y = leapPos[1] - top;
+
+      x /= iBox.size[0];
+      y /= iBox.size[1];
+
+      return [ x , -y ];
+    }
+
+    controller.loop(function(frame) {
+        if (frame.valid) {
+          if (typeof firstValidFrame === "undefined") {
+            firstValidFrame = frame
+          }
+
+          if(frame.hands && frame.hands.length > 0) {
+              var handPos = leapToScene( firstValidFrame , frame.hands[0].palmPosition );
+
+              scope.kaleidoscope.zoomTarget  = 1.0 + 1.0 * handPos[1];
+              scope.kaleidoscope.angleTarget = handPos[0];
+          } 
+
+          if(frame.gestures && frame.gestures.length > 0) {
+            var gesture = frame.gestures[0];
+
+            if(gesture.type === "swipe") {
+                var startPos = leapToScene(frame, gesture.startPosition );
+                var pos = leapToScene( frame, gesture.position );
+    
+                if(startPos[0] - pos[0] < 0) {
+                    console.log("Swipe event");
+                    throttledChange();
+                }
+            }
+          }
+        }
+    });
 });
