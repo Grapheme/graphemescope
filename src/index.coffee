@@ -7,9 +7,6 @@ window.Graphemescope = (container, imageSource, audioSource) ->
     image.onload = ->
         kaleidoscope.setImage(image)
 
-    NUM_BANDS = 32
-    SMOOTHING = 0.5
-
     analyzeCallback = (data) ->
         windowCoeffs = [0.1, 0.1, 0.8, 1.0, 0.8, 0.5, 0.1];
 
@@ -20,12 +17,12 @@ window.Graphemescope = (container, imageSource, audioSource) ->
         kaleidoscope.angleTarget = secondaryBeat    / 50
 
     # setup the audio analyser
-    analyser = new AudioAnalyser audioSource, NUM_BANDS, SMOOTHING
+    analyser = new AudioAnalyser
 
     analyser.onUpdate = analyzeCallback
+    analyser.setAudio( audioSource )
 
-    # start as soon as the audio is buffered
-    analyser.start();
-
-    # show audio controls
-    document.body.appendChild analyser.audio
+    return {
+        kaleidoscope : kaleidoscope
+        analyser     : analyser
+    }

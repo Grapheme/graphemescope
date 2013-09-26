@@ -1,14 +1,7 @@
-	$(function() {
-	var imagePath = "img/pattern.jpg";
-
+$(function() {
 	var container = $("#container");
 
-	resizeHandler = function() {
-		container.height( $(window).height() );
-		container.width( $(window).width() );
-	};
-
-    var kaleidoscope = new Kaleidoscope( container[0] );
+    var kaleidoscope = new Kaleidoscope(container[0]);
 
     // Init Drag'n'Drop 
     var dragdrop = new DragDrop(container[0],  function (files) {
@@ -28,22 +21,22 @@
       
     });
 
+    var index = 0;
+    var imageCount = 4;
 
-    setTimeout(function() {
-        var img = new Image();
-        img.src = "img/pattern-change.jpg";
-        kaleidoscope.setImage(img);
-    }, 3000);
-       
-    // setInterval(function() {
-    // 	kaleidoscope.draw();
-    // }, 1000 / 30);
+    function changePicture() {
+        var imagePath = "img/pattern-" + index + ".jpg";
 
-    var image = new Image();
-    image.src = imagePath;
-    image.onload = function() {
-        kaleidoscope.setImage(image);
-    };
+        var image = new Image();
+        image.src = imagePath;
+        image.onload = function() {
+            kaleidoscope.setImage(image);
+        };
+
+        index = (index + 1) % imageCount;
+    }
+
+    changePicture();
 
     $(window).mousemove(function(event) {
 		var factorx = event.pageX / $(window).width();
@@ -52,6 +45,13 @@
 		kaleidoscope.angleTarget = factorx;
 		kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
     });
+
+    $(window).click(changePicture);
+
+    var resizeHandler = function() {
+        container.height( $(window).height() );
+        container.width( $(window).width() );
+    };
 
 	$(window).resize(resizeHandler);
 	$(window).resize();

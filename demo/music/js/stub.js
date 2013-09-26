@@ -1,4 +1,4 @@
-	$(function() {
+window.addEventListener("load", function() {
   	var imagePath = "img/pattern.jpg";
     var musicPath = "audio/music.mp3";
 
@@ -13,4 +13,18 @@
     $(window).resize();
 
     var scope = new Graphemescope(container[0], imagePath, musicPath);
+
+    var toggle = true;
+
+    $(window).click(function() {
+      toggle = !toggle;
+
+      if(toggle) {
+        console.log("Play");
+        scope.analyser.current.play();
+      } else {
+        console.log("Pause");
+        scope.analyser.current.pause();
+      }
+    });
 });
