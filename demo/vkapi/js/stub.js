@@ -1,4 +1,6 @@
 $(function() {
+    window.wallSource = "";
+
     container = $("#container");
     window.scope = new Graphemescope( container[0] );
 
@@ -55,11 +57,10 @@ $(function() {
 
             VK.Api.call('wall.get', {
                 offset : index,
-                domain : 'molefrog',
+                domain : wallSource,
                 count  : 1,
                 filter : 'owner'
-            }, function(r) {   
-                totalCount = r.response[0];
+            }, function(r) {  
                 if(!(r.response && r.response[1] && r.response[1].attachments)) {
                     return getNext();
                 }   
@@ -91,7 +92,6 @@ $(function() {
                     return getNext(index);
                 }
 
-                console.log
                 var imageSrc = photos[0];
                 var musicSrc = music[0];
 
@@ -99,6 +99,44 @@ $(function() {
             });
         }
 
-        getNext();
+
+       Router = Backbone.Router.extend({
+            routes : {
+                ":name" : "name",
+                "" : "default"
+            },
+
+            name : function(name) {
+                wallSource = name;
+
+                VK.Api.call('wall.get', {
+                    offset : 0,
+                    domain : wallSource,
+                    count  : 1,
+                    filter : 'owner'
+                }, function(r) {  
+                    if(r.response && r.response[0]) {
+                        totalCount = r.response[0];
+                        getNext(); 
+                    }
+                });
+            },
+
+            default : function() {
+                var that = this;
+                VK.Api.call("users.get", {
+                    "fields" : "screen_name"
+                }, function(r) {
+                    that.navigate(r.response[0].screen_name, {trigger: true});
+                });
+            }
+       });
+
+       new Router();
+       Backbone.history.start();
+
+    setInterval(getNext, 15000);
    } 
+
+
 });
