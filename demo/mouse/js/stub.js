@@ -102,6 +102,9 @@ $(function() {
               var handPos = leapToScene( firstValidFrame , frame.hands[0].palmPosition );
 
               scope.kaleidoscope.zoomTarget  = 1.0 + 1.0 * handPos[1];
+              if(scope.kaleidoscope.zoomTarget < 1.0) 
+                scope.kaleidoscope.zoomTarget = 1.0;
+              
               scope.kaleidoscope.angleTarget = handPos[0];
           } 
 

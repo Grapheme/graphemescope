@@ -1,10 +1,7 @@
 $(function() {
- var streaming = false,
-      video        = document.querySelector('#video'),
-      canvas       = document.querySelector('#canvas'),
-      photo        = document.querySelector('#photo'),
-      width = 320,
-      height = 0;
+ var streaming    = false;
+ var video        = document.querySelector('#video');
+ var canvas       = document.querySelector('#canvas');
 
   navigator.getMedia = ( navigator.getUserMedia ||
                          navigator.webkitGetUserMedia ||
@@ -32,26 +29,25 @@ $(function() {
 
   video.addEventListener('canplay', function(ev){
     if (!streaming) {
-      height = video.videoHeight / (video.videoWidth/width);
-      video.setAttribute('width', width);
-      video.setAttribute('height', height);
-      canvas.setAttribute('width', width);
-      canvas.setAttribute('height', height);
+      canvas.setAttribute('width', video.videoWidth);
+      canvas.setAttribute('height', video.videoHeight);
       streaming = true;
-
     }
   }, false);
 
-  function takepicture() {
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+  function takePicture() {
+   if(streaming) {
 
-    var image = new Image();
-    var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-    scope.setImage(photo);
+      var image = new Image();
+      image.src = canvas.toDataURL('image/png');
+      scope.setImage(image);
+    }
+
   }
 
 
@@ -101,17 +97,19 @@ $(function() {
         }
     });
 
-    $(window).click(takepicture);
+    $(window).click(takePicture);
 
     var resizeHandler = function() {
         container.height( $(window).height() );
         container.width( $(window).width() );
     };
 
-	$(window).resize(resizeHandler);
-	$(window).resize();
+  	$(window).resize(resizeHandler);
+  	$(window).resize();
 
-    var throttledChange = _(changePicture).throttle(1000, {leading: false});
+    setInterval(takePicture, 5000);
+
+    var throttledChange = _(takePicture).throttle(5000);
 
 
     var controller = new Leap.Controller({ enableGestures : true });
@@ -158,20 +156,21 @@ $(function() {
               var handPos = leapToScene( firstValidFrame , frame.hands[0].palmPosition );
 
               scope.kaleidoscope.zoomTarget  = 1.0 + 1.0 * handPos[1];
+              if(scope.kaleidoscope.zoomTarget < 1.0) 
+                scope.kaleidoscope.zoomTarget = 1.0;
+
+              if(scope.kaleidoscope.zoomTarget > 1.6) 
+                scope.kaleidoscope.zoomTarget = 1.6;
+
+
               scope.kaleidoscope.angleTarget = handPos[0];
           } 
 
           if(frame.gestures && frame.gestures.length > 0) {
             var gesture = frame.gestures[0];
 
-            if(gesture.type === "swipe") {
-                var startPos = leapToScene(frame, gesture.startPosition );
-                var pos = leapToScene( frame, gesture.position );
-    
-                if(startPos[0] - pos[0] < 0) {
-                    console.log("Swipe event");
-                    throttledChange();
-                }
+            if(gesture.type === "circle") {
+            //  throttledChange();
             }
           }
         }
