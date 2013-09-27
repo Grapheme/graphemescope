@@ -14,7 +14,13 @@ module.exports = (grunt) ->
         files:
           "lib/graphemescope.js" : [ "src/*.coffee" ]
 
+    uglify:
+      compile:
+        files:
+          "lib/graphemescope.js" : [ "lib/graphemescope.js" ]
+
   grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-contrib-watch"
+  grunt.loadNpmTasks "grunt-contrib-uglify"
 
-  grunt.registerTask "default", [ "coffee" ]
+  grunt.registerTask "default", [ "coffee", "uglify" ]

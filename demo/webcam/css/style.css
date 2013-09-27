@@ -1,0 +1,33 @@
+body, html {
+  background-color: black;
+  padding : 0;
+  margin : 0;
+  overflow: hidden;
+}
+
+#container {
+  margin: 0;
+  padding: 0;
+}
+
+.equalizer {
+  position : absolute;
+  top : 0;
+  left : 0;
+  height: 20px;
+  z-index : 1;
+}
+
+audio {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  top: 0;
+}
+
+.equalizer div {
+  display : inline-block;
+	background-color: #ffffff;
+	margin: 1px;
+	width : 10px;
+}
