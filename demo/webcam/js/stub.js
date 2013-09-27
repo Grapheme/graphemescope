@@ -11,7 +11,7 @@ $(function() {
   navigator.getMedia(
     {
       video: true,
-      audio: false
+      audio: true
     },
     function(stream) {
       if (navigator.mozGetUserMedia) {
