@@ -1,7 +1,4 @@
 window.addEventListener("load", function() {
-
-    
-
   	var imagePath = "img/pattern.jpg";
     var musicPath = "audio/music.mp3";
 
@@ -19,18 +16,13 @@ window.addEventListener("load", function() {
     scope.setImage(imagePath);
     scope.setAudio(musicPath);
 
-
-    var toggle = true;
-
     $(container).click(function() {
-      toggle = !toggle;
-
-      if(toggle) {
+      if( scope.analyser.paused ) {
         console.log("Play");
-        scope.analyser.current.play();
+        scope.analyser.play();
       } else {
         console.log("Pause");
-        scope.analyser.current.pause();
+        scope.analyser.pause();
       }
     });
 });

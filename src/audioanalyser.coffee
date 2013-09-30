@@ -71,6 +71,8 @@ window.AudioAnalyser = class AudioAnalyser
 
     @analyser.connect @jsNode
     @jsNode.connect @context.destination
+
+    @paused = true
   
     @jsNode.onaudioprocess = =>
       # retreive the data from the first channel
@@ -84,12 +86,14 @@ window.AudioAnalyser = class AudioAnalyser
 
     current = @current = new AudioElement @context, src, =>
       current.gainNode.connect @analyser
-      current.play()
+      @play()
 
-  play : 
+  play : ->
+    @paused = false
     @current?.play()
 
-  pause : 
+  pause : ->
+    @paused = true
     @current?.pause()
 
 

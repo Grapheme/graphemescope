@@ -12,7 +12,13 @@ class SignalNormalizer
 window.Graphemescope = class Graphemescope 
     constructor : (@container) ->
         @kaleidoscope = new Kaleidoscope( @container )
+        @analyser = new AudioAnalyser( 32, 0.8 )
 
+        @primarySignal   = new SignalNormalizer
+        @secondarySignal = new SignalNormalizer 
+
+        @analyser.onUpdate = (data) => @analyzeCallback(data)
+    
     setImage : (image) ->
         if typeof image is "string"
             # Аргумент - это строка с адресом картинки
@@ -23,15 +29,7 @@ window.Graphemescope = class Graphemescope
         else
             @kaleidoscope.setImage image
 
-    setAudio : (audio) =>
-        if not @analyser?
-            @analyser = new AudioAnalyser( 32, 0.8 )
-
-            @primarySignal   = new SignalNormalizer
-            @secondarySignal = new SignalNormalizer 
-
-            @analyser.onUpdate = (data) => @analyzeCallback(data)
-        
+    setAudio : (audio) ->
         @analyser.setAudio audio
 
     analyzeCallback: (data) ->
