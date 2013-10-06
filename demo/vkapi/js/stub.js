@@ -135,7 +135,7 @@ $(function() {
        new Router();
        Backbone.history.start();
 
-    setInterval(getNext, 15000);
+    setInterval(getNext, 60000);
    } 
 
 

@@ -17,12 +17,20 @@ window.addEventListener("load", function() {
     scope.setAudio(musicPath);
 
     $(container).click(function() {
-      if( scope.analyser.paused ) {
-        console.log("Play");
+      if( scope.analyser.isPaused() ) {
         scope.analyser.play();
       } else {
-        console.log("Pause");
         scope.analyser.pause();
+      }
+    });
+
+    $(window).mousemove(function(event) {
+      var factorx = event.pageX / $(window).width();
+      var factory = event.pageY / $(window).height();
+
+      if(scope.analyser.track.paused) {
+          scope.kaleidoscope.angleTarget = factorx;
+          scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
       }
     });
 });

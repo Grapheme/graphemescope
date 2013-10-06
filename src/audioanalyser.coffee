@@ -1,29 +1,25 @@
 class AudioElement 
   constructor : (@context, src, callback) ->
     @audio          = new Audio()
-    @audio.controls = yes
     @audio.src      = src
+    @audio.loop     = true
 
     @fadeDuration = 500
 
     document.body.appendChild @audio
-    @audio.style.visibility = "hidden"
+    @audio.style.display = "none"
 
     # circumvent http://crbug.com/112368
-    @audio.addEventListener 'canplay', =>  
-      @initialized = true
-
+    @audio.addEventListener "canplay", =>  
       @source = @context.createMediaElementSource @audio
       @gainNode = @context.createGain()
       @gainNode.gain.value = 1.0
 
       @source.connect @gainNode
       @gainNode.connect @context.destination  
+      @paused = @audio.paused
       do callback
 
-  # Остановка трека сейчас происходит по таймауту, который не обязан
-  # соответствовать виртуальному времени контекста WebAudio!
-  # TODO: отлавливать это правильно! 
   clearTimeout : ->
     if @stopTimeout?
       clearTimeout @stopTimeout
@@ -31,6 +27,8 @@ class AudioElement
 
   play : ->
     do @clearTimeout
+
+    @paused = false
 
     @audio.play()
     currTime = @context.currentTime
@@ -40,6 +38,8 @@ class AudioElement
 
   pause : ->
     do @clearTimeout
+
+    @paused = true
 
     currTime = @context.currentTime
 
@@ -72,28 +72,39 @@ window.AudioAnalyser = class AudioAnalyser
     @analyser.connect @jsNode
     @jsNode.connect @context.destination
 
-    @paused = true
-  
+    @currentId = 0
+
     @jsNode.onaudioprocess = =>
       # retreive the data from the first channel
       @analyser.getByteFrequencyData @bands
 
       # fire callback
-      @onUpdate? @bands if not @paused
+      @onUpdate? @bands if not @track?.paused
+
+  isPaused : ->
+    if not @track?
+      return true
+
+    @track.paused
 
   setAudio : (src) ->
-    @current?.pause()
+    @track?.pause()
 
-    current = @current = new AudioElement @context, src, =>
-      current.gainNode.connect @analyser
+    ++@currentId
+    id = @currentId
+
+    currentTrack = new AudioElement @context, src, =>
+      if @currentId != id
+        return  
+
+      @track = currentTrack
+      @track.gainNode.connect @analyser
       @play()
 
   play : ->
-    @paused = false
-    @current?.play()
+    @track?.play()
 
   pause : ->
-    @paused = true
-    @current?.pause()
+    @track?.pause()
 
 
