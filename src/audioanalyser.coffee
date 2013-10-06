@@ -79,7 +79,7 @@ window.AudioAnalyser = class AudioAnalyser
       @analyser.getByteFrequencyData @bands
 
       # fire callback
-      @onUpdate? @bands if not @track?.paused
+      @onUpdate? @bands if not @isPaused()
 
   isPaused : ->
     if not @track?
