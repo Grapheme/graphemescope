@@ -12,7 +12,7 @@ class SignalNormalizer
 window.Graphemescope = class Graphemescope 
     constructor : (@container) ->
         @kaleidoscope = new Kaleidoscope( @container )
-        @analyser = new AudioAnalyser( 32, 0.8 )
+        @analyser = new AudioAnalyser( 256, 0.5 )
 
         @primarySignal   = new SignalNormalizer
         @secondarySignal = new SignalNormalizer 
@@ -33,16 +33,16 @@ window.Graphemescope = class Graphemescope
         @analyser.setAudio audio
 
     analyzeCallback: (data) ->
-        windowCoeffs = [0.1, 0.1, 0.8, 1.0, 0.8, 0.5, 0.1];
-
         primaryBeat = secondaryBeat = 0
+
+        for i in [128...196]
+            primaryBeat += (data[i] / 256)
+
+        for i in [32...64]
+            secondaryBeat += (data[i] / 256)
         
-        for i in [0...windowCoeffs.length] 
-            primaryBeat   += (data[10 + i] * windowCoeffs[i]) 
-            secondaryBeat += (data[0  + i] * windowCoeffs[i]) 
-        
-        @kaleidoscope.zoomTarget = 1.0 + 0.5 * @primarySignal.process primaryBeat
-        @kaleidoscope.angleTarget = @secondarySignal.process secondaryBeat
+        @kaleidoscope.zoomTarget = 1.0 + 1.2 * @primarySignal.process primaryBeat
+        @kaleidoscope.angleTarget = -0.5 + 0.5 * @secondarySignal.process secondaryBeat
 
 
 
