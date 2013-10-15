@@ -17,6 +17,8 @@ window.addEventListener("load", function() {
     scope.setAudio(musicPath);
 
     $(container).click(function() {
+      if(!AudioAnalyser.supported) return;
+
       if( scope.analyser.isPaused() ) {
         scope.analyser.play();
       } else {
@@ -28,7 +30,7 @@ window.addEventListener("load", function() {
       var factorx = event.pageX / $(window).width();
       var factory = event.pageY / $(window).height();
 
-      if(scope.analyser.track.paused) {
+      if(!AudioAnalyser.supported || scope.analyser.isPaused()) {
           scope.kaleidoscope.angleTarget = factorx;
           scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
       }

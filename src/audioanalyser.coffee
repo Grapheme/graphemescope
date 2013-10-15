@@ -57,6 +57,9 @@ window.AudioAnalyser = class AudioAnalyser
   @supported: @AudioContext?
   
   constructor: (@numBands = 256, @smoothing = 0.3 ) ->
+    if not AudioAnalyser.supported
+      return
+
     # Создаем аудио-контекст (синглтон)
     @context = new AudioAnalyser.AudioContext()
     

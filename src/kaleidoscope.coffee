@@ -4,9 +4,9 @@
 requestAnimFrame = (->
   window.requestAnimationFrame || 
   window.webkitRequestAnimationFrame || 
-  window.mozRequestAnimationFrame || (callback) ->
-    # It is reasonable to use 24 fps for old browsers
-    window.setTimeout callback, (1000 / 24) 
+  window.mozRequestAnimationFrame || 
+  (callback) ->
+    window.setTimeout callback, (1000 / 30) 
 )()
 
 # Калейдоскоп
@@ -30,9 +30,6 @@ window.Kaleidoscope = class Kaleidoscope
 
     @domElement ?= document.createElement "canvas"
     @ctx        ?= @domElement.getContext "2d"
-
-    @image      ?= document.createElement "img"
-    @imageProxy ?= document.createElement "img"
 
     @alphaFactor = 1.0
     @alphaTarget = 1.0
@@ -67,7 +64,7 @@ window.Kaleidoscope = class Kaleidoscope
     do @oldResizeHandler
 
   # Функция рисует заданную картинку в центре правильного треугольника
-  drawImage : (image, alpha) ->
+  drawImage : (image, pattern, alpha) ->
     @ctx.save()
     # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
     # заполняет треугольник
@@ -81,7 +78,8 @@ window.Kaleidoscope = class Kaleidoscope
     @ctx.translate -0.5 * image.width, -0.5 * image.height
 
     @ctx.globalAlpha = alpha
-    @ctx.fillStyle = @ctx.createPattern image, "repeat"
+    @ctx.fillStyle = pattern
+    
     @ctx.fill()
     @ctx.restore()
 
@@ -109,8 +107,11 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.closePath()
 
       # Рисуем две картинки: основную и заднюю для эмуляции эффекта плавного перехода
-      @drawImage(@image, @alphaFactor)
-      @drawImage(@imageProxy, 1 - @alphaFactor)
+      if @image?
+        @drawImage(@image, @pattern, @alphaFactor)
+
+      if @imageProxy?
+        @drawImage(@imageProxy, @patternProxy, 1 - @alphaFactor)
 
       @ctx.restore()
 
@@ -165,8 +166,13 @@ window.Kaleidoscope = class Kaleidoscope
     @ctx.restore()
 
   setImage : (image) ->
-    @imageProxy = @image
+    if @image?
+      @imageProxy = @image
+      @patternProxy = @pattern 
+
     @image = image
+    @pattern = @ctx.createPattern @image, "repeat"
+
     @alphaFactor = 0.0
 
 

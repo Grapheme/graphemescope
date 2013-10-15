@@ -12,12 +12,14 @@ class SignalNormalizer
 window.Graphemescope = class Graphemescope 
     constructor : (@container) ->
         @kaleidoscope = new Kaleidoscope( @container )
-        @analyser = new AudioAnalyser( 256, 0.5 )
 
-        @primarySignal   = new SignalNormalizer
-        @secondarySignal = new SignalNormalizer 
+        if AudioAnalyser.supported
+            @analyser = new AudioAnalyser( 256, 0.5 )
+            
+            @primarySignal   = new SignalNormalizer
+            @secondarySignal = new SignalNormalizer 
 
-        @analyser.onUpdate = (data) => @analyzeCallback(data)
+            @analyser.onUpdate = (data) => @analyzeCallback(data)
     
     setImage : (image) ->
         if typeof image is "string"
@@ -30,7 +32,8 @@ window.Graphemescope = class Graphemescope
             @kaleidoscope.setImage image
 
     setAudio : (audio) ->
-        @analyser.setAudio audio
+        if AudioAnalyser.supported
+            @analyser.setAudio audio
 
     analyzeCallback: (data) ->
         primaryBeat = secondaryBeat = 0
