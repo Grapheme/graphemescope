@@ -28,21 +28,37 @@ $(function() {
     function changePicture() {
         var imagePath = "img/pattern-" + index + ".jpg";
 
-        scope.setImage(imagePath);
+        scope.setImage(imagePath);  
 
         index = (index + 1) % imageCount;
     }
 
     changePicture();
 
-    $(window).mousemove(function(event) {
-		var factorx = event.pageX / $(window).width();
-		var factory = event.pageY / $(window).height();
 
+    function moveKaleidoscope(factorx, factory) {
         if(!leapEnabled) {
             scope.kaleidoscope.angleTarget = factorx;
             scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
         }
+    }
+
+    $(window).mousemove(function(event) {
+        moveKaleidoscope(
+            event.pageX / $(window).width(),
+            event.pageY / $(window).height()
+        );
+    });
+
+    $(window).on("touchmove", function(evt) {
+        evt.preventDefault();
+        var originalEvent = evt.originalEvent;
+        
+        var touch = originalEvent.touches[0];  
+        moveKaleidoscope(
+            touch.pageX / $(window).width(),
+            touch.pageY / $(window).height()
+        );
     });
 
     $(window).click(changePicture);
@@ -52,8 +68,8 @@ $(function() {
         container.width( $(window).width() );
     };
 
-	$(window).resize(resizeHandler);
-	$(window).resize();
+		$(window).resize(resizeHandler);
+		$(window).resize();
 
     var throttledChange = _(changePicture).throttle(1000, {leading: false});
 
