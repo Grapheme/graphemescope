@@ -37,6 +37,7 @@ window.Kaleidoscope = class Kaleidoscope
     @parentElement.appendChild @domElement
 
     # Запоминаем старый обработчик события resize
+    # TODO: сделать через addEventListener!
     @oldResizeHandler = () ->
 
     if window.onresize != null
@@ -63,8 +64,21 @@ window.Kaleidoscope = class Kaleidoscope
 
     do @oldResizeHandler
 
+  # Функция обновления параметром (для изменения параметров движения)
+  update: ->
+    if @easeEnabled
+      # Плавность включена
+      @angleFactor += ( @angleTarget - @angleFactor ) * @ease
+      @zoomFactor  += ( @zoomTarget  - @zoomFactor  ) * @ease
+      @alphaFactor += ( @alphaTarget - @alphaFactor ) * @ease 
+    else 
+      # Плавность выключена
+      @angleFactor = @angleTarget
+      @zoomFactor  = @zoomTarget
+      @alphaFactor = @alphaTarget
+
   # Функция рисует заданную картинку в центре правильного треугольника
-  drawImage : (image, pattern, alpha) ->
+  drawImage : (image) ->
     @ctx.save()
     # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
     # заполняет треугольник
@@ -77,17 +91,12 @@ window.Kaleidoscope = class Kaleidoscope
     @ctx.rotate @angleFactor * 2 * Math.PI
     @ctx.translate -0.5 * image.width, -0.5 * image.height
 
-    @ctx.globalAlpha = alpha
-    @ctx.fillStyle = pattern
-    
     @ctx.fill()
     @ctx.restore()
 
   # Функция рисует одну ячейку (соту) калейдоскопа в центре 
   # системы координат с радиусом @radius 
-  drawCell : ->
-    @ctx.save()
-
+  drawCell : (image) ->
     # Сота состоит из 6 лепестков, каждый лепесток - 
     # равносторонний треугольник с радиусом @radius
     for cellIndex in [ 0...6 ]
@@ -106,32 +115,12 @@ window.Kaleidoscope = class Kaleidoscope
       @ctx.lineTo  0.5 * @radius, 1.0 * @radiusHeight
       @ctx.closePath()
 
-      # Рисуем две картинки: основную и заднюю для эмуляции эффекта плавного перехода
-      if @image?
-        @drawImage(@image, @pattern, @alphaFactor)
-
-      if @imageProxy?
-        @drawImage(@imageProxy, @patternProxy, 1 - @alphaFactor)
+      @drawImage image
 
       @ctx.restore()
 
-    @ctx.restore()
-
-  update: ->
-    if @easeEnabled
-      # Плавность включена
-      @angleFactor += ( @angleTarget - @angleFactor ) * @ease
-      @zoomFactor  += ( @zoomTarget  - @zoomFactor  ) * @ease
-      @alphaFactor += ( @alphaTarget - @alphaFactor ) * @ease 
-    else 
-      # Плавность выключена
-      @angleFactor = @angleTarget
-      @zoomFactor  = @zoomTarget
-      @alphaFactor = @alphaTarget
-
-
   # Функция отрисовки
-  draw: ->
+  drawLayer: (image) ->
     @ctx.save()
 
     # Перемещаемся в центр
@@ -140,11 +129,11 @@ window.Kaleidoscope = class Kaleidoscope
     # Вычисляем, сколько сот нужно рисовать
     # (не уверен, что формулы работают оптимально, но экран 
     # они покрывают)
-    verticalLimit   = Math.ceil(0.5 * @height / @radiusHeight)
-    horizontalLimit = Math.ceil(0.5 * @width  / (3 * @radius)) 
+    verticalLimit   =  Math.ceil(0.5 * @height / @radiusHeight)
+    horizontalLimit =  Math.ceil(0.5 * @width  / (3 * @radius)) 
     
-    horizontalStrype = [-horizontalLimit .. horizontalLimit]
-    verticalStrype   = [-verticalLimit .. verticalLimit]
+    horizontalStrype = [ -horizontalLimit .. horizontalLimit ]
+    verticalStrype   = [ -verticalLimit .. verticalLimit ]
 
     for v in verticalStrype
       @ctx.save()
@@ -158,12 +147,23 @@ window.Kaleidoscope = class Kaleidoscope
         @ctx.save()
         
         @ctx.translate 3 * h * @radius, 0
-        do @drawCell 
+        @drawCell image 
 
         @ctx.restore()
 
       @ctx.restore()  
     @ctx.restore()
+
+  draw : ->
+    if @imageProxy?
+      @ctx.fillStyle   = @patternProxy
+      @ctx.globalAlpha = 1 - @alphaFactor
+      @drawLayer @imageProxy
+
+    if @image?    
+      @ctx.fillStyle   = @pattern
+      @ctx.globalAlpha = @alphaFactor  
+      @drawLayer @image
 
   setImage : (image) ->
     if @image?
