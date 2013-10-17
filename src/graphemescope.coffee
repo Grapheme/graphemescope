@@ -38,19 +38,14 @@ window.Graphemescope = class Graphemescope
     analyzeCallback: (data) ->
         primaryBeat = secondaryBeat = 0
 
-        for i in [128...256]
+        for i in [128...196]
             primaryBeat += (data[i] / 256)
 
-        primaryBeat /= 128
-
-        for i in [0...128]
+        for i in [0...64]
             secondaryBeat += (data[i] / 256)
 
-        secondaryBeat /= 128
-        
-        @kaleidoscope.zoomTarget = 1.0 + 1.0 *  primaryBeat
-        @kaleidoscope.angleTarget = -0.5 + 0.5 * secondaryBeat
-
+        @kaleidoscope.zoomTarget = 1.0 + 0.5 * @primarySignal.process primaryBeat
+        @kaleidoscope.angleTarget = -0.5 + 0.5 * @secondarySignal.process secondaryBeat
 
 
        
