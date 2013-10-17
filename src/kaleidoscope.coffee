@@ -80,13 +80,17 @@ window.Kaleidoscope = class Kaleidoscope
   # Функция рисует заданную картинку в центре правильного треугольника
   drawImage : (image) ->
     @ctx.save()
+
+    # Cчитаем радиус описанной окружности
+    outerRadius = 2 / 3 * @radiusHeight
+    
     # Делаем масштабирование таким, что при zoomFactor = 1 картинка полностью оптимально
     # заполняет треугольник
-    zoom = @zoomFactor * @radius / Math.min(image.width, image.height)
+    zoom = @zoomFactor * outerRadius / (0.5 * Math.min(image.width, image.height))
 
     # Помещаем центр вращения в центр треугольника, то есть в центр описанной окружности.
     # Центр лежит на высоте и делит ее в отношении 2/3
-    @ctx.translate 0, 2/3 * @radiusHeight 
+    @ctx.translate 0, outerRadius 
     @ctx.scale zoom, zoom
     @ctx.rotate @angleFactor * 2 * Math.PI
     @ctx.translate -0.5 * image.width, -0.5 * image.height
