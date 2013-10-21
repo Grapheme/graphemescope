@@ -1,8 +1,24 @@
 body, html {
   background-color: black;
+  color : white;
   padding : 0;
   margin : 0;
   overflow: hidden;
+}
+
+#beat {
+  position: fixed;
+
+  left : 50%;
+  top : 0;
+  z-index: 4;
+  width : 100px;
+  height: 100px;
+
+  margin-left : -50px;
+  border-radius: 100px;
+
+  background-color: #ff06cc;
 }
 
 #container {
@@ -10,24 +26,4 @@ body, html {
   padding: 0;
 }
 
-.equalizer {
-  position : absolute;
-  top : 0;
-  left : 0;
-  height: 20px;
-  z-index : 1;
-}
 
-audio {
-  position: absolute;
-  z-index: 2;
-  right: 0;
-  top: 0;
-}
-
-.equalizer div {
-  display : inline-block;
-	background-color: #ffffff;
-	margin: 1px;
-	width : 10px;
-}
