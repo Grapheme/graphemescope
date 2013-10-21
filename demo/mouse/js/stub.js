@@ -14,7 +14,7 @@ $(function() {
             reader.onload = function(event) {
                 var img = new Image();
                 img.src = event.target.result;
-                scope.kaleidoscope.setImage(img);
+                scope.setImage(img);
             };
 
             reader.readAsDataURL(file);
@@ -38,8 +38,8 @@ $(function() {
 
     function moveKaleidoscope(factorx, factory) {
         if(!leapEnabled) {
-            scope.kaleidoscope.angleTarget = factorx;
-            scope.kaleidoscope.zoomTarget  = 1.0 + 0.5 * factory;
+            scope.angleTarget = factorx;
+            scope.zoomTarget  = 1.0 + 0.5 * factory;
         }
     }
 
@@ -117,11 +117,11 @@ $(function() {
           if(frame.hands && frame.hands.length > 0) {
               var handPos = leapToScene( firstValidFrame , frame.hands[0].palmPosition );
 
-              scope.kaleidoscope.zoomTarget  = 1.0 + 1.0 * handPos[1];
-              if(scope.kaleidoscope.zoomTarget < 1.0) 
-                scope.kaleidoscope.zoomTarget = 1.0;
+              scope.zoomTarget  = 1.0 + 1.0 * handPos[1];
+              if(scope.zoomTarget < 1.0) 
+                scope.zoomTarget = 1.0;
               
-              scope.kaleidoscope.angleTarget = handPos[0];
+              scope.angleTarget = handPos[0];
           } 
 
           if(frame.gestures && frame.gestures.length > 0) {

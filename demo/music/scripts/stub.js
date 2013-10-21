@@ -48,7 +48,7 @@ window.addEventListener("load", function() {
         offKick: function () {}
     }).on();
 
-    dancer.load({ src: "../../vkaudio/e9b50ef80f315b.mp3" });
+    dancer.load({ src: "music.mp3" });
 
 
     scope.setImage(imagePath);
@@ -64,8 +64,8 @@ window.addEventListener("load", function() {
 
 
 
-      scope.kaleidoscope.angleTarget = r;
-      scope.kaleidoscope.zoomTarget  = 1.0 + 5.0 * one;
+      scope.angleTarget = r;
+      scope.zoomTarget  = 1.0 + 5.0 * one;
 
       moveScope();
     });
