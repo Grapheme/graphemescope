@@ -1,5 +1,17 @@
 ## Graphemescope
-Библиотека для рисования калейдоскопических визуализаций.
+Библиотека для рисования калейдоскопических визуализаций. Пример использования:
+```javascript
+// Родительский элемент
+var container = document.getElementById("container");
+
+// Создаем калейдоскоп
+var scope = new Graphemescope( container );
+scope.setImage("http://placekitten.com/200/30");
+
+// Двигаем
+scope.zoomTarget  = 2.0;
+scope.angleTarget = 0.5;
+```
 
 ### Сборка проекта
 В проекте присутствуют скрипты на языке `CoffeScript`, которые необходимо 
@@ -18,7 +30,6 @@ npm install -g coffee-script
 3. Установить зависимости проекта:
 
 ```	
-cd grapheme2.0
 npm install
 ```
 
@@ -29,10 +40,3 @@ npm install
 grunt
 ```
 
-#### Live Reload
-Средство grunt также позволяет отслеживать изменения исходных файлов и 
-автоматически пересобирать проект:
-
-```	
-grunt watch
-```
